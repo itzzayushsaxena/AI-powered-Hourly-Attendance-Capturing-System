@@ -16,6 +16,8 @@ class Main:
                                   activebackground='gray', activeforeground='white', cursor='hand2',
                                   command=self.user_window)
         self.normal_user.place(relx=0.4, rely=0.5, anchor=CENTER,width=100,height=80)
+
+
         self.admin = Button(root, text="Admin", font=("times new roman", 15, 'bold'), bg='gray', fg='white',
                             activebackground='gray', activeforeground='white', cursor='hand2',
                             command=self.admin_window)
@@ -24,13 +26,13 @@ class Main:
     def user_window(self):
         self.root.destroy()
 
-        import user
+        import user_login
         # print(user)
 
 
     def admin_window(self):
         self.root.destroy()
-        import admin
+        import admin_login
 
 root = Tk()
 obj = Main(root)
