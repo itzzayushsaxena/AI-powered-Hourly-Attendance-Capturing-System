@@ -3,15 +3,23 @@ from tkinter import messagebox
 
 
 class Admin_Login:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("AI-PHACS | Admin Login Page")
-        self.root.state('zoomed')
+    def __init__(self, admin):
+        self.admin = admin
+        self.admin.title("AI-PHACS | Admin Login Page")
+        self.admin.state('zoomed')
         self.bg=PhotoImage(file="images/login-page-background.png")
-        self.bg_image=Label(self.root, image=self.bg).place(x=0 , y=0, relwidth=1, relheight=1)
+        self.bg_image=Label(self.admin, image=self.bg).place(x=0 , y=0, relwidth=1, relheight=1)
+
+        self.back = PhotoImage(file="images/back.png")
+        self.create_widgets()
+
+    def create_widgets(self):
+        backButton = Button(root, image=self.back, command=self.backClicked, border=0, height=190,
+                            width=341)
+        backButton.place(x=20, y=50)
 
         #login_Frame
-        login_frame=Frame(self.root, bg='white', )
+        login_frame=Frame(self.admin, bg='white', )
         login_frame.place(x=150, y=200, height=450, width=500)
 
 
@@ -48,12 +56,16 @@ class Admin_Login:
 
     def submit_clicked(self):
         # if true:
-        #     self.root.destroy()
+        #     self.admin.destroy()
         #     import admin_page
         # else:
         #     messagebox.showerror("Error", "Input is Invalid OR press Reset Button.")
-        self.root.destroy()
+        self.admin.destroy()
         import admin_page
+
+    def backClicked(self):
+        self.admin.destroy()
+        import main
 
 root = Tk()
 obj = Admin_Login(root)

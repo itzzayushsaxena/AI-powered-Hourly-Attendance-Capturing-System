@@ -8,6 +8,13 @@ class User_Login:
         self.root.state('zoomed')
         self.bg = PhotoImage(file="images/login-page-background.png")
         self.bg_image = Label(self.root, image=self.bg).place(x=0, y=0, relwidth=1, relheight=1)
+        self.back = PhotoImage(file="images/back.png")
+        self.create_widgets()
+
+    def create_widgets(self):
+        backButton = Button(root, image=self.back, command=self.backClicked, border=0, height=190,
+                            width=341)
+        backButton.place(x=20, y=50)
 
         # login_Frame
         login_frame = Frame(self.root, bg='white', )
@@ -51,6 +58,9 @@ class User_Login:
         self.root.destroy()
         import user_page
 
+    def backClicked(self):
+        self.root.destroy()
+        import main
 
 root = Tk()
 obj = User_Login(root)
