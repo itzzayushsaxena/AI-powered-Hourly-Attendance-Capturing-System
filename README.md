@@ -2,7 +2,8 @@
 
 ## Requirements
 
+### python version >= 3
+
 ## Known Bugs
 
-#### 1. back button is not working properly
-     (after clicking 2-3 time closes every window)
+#### ...

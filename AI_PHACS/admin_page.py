@@ -9,7 +9,9 @@ class Admin_Page:
         self.create_widgets()
 
     def create_widgets(self):
-        self.linearPhoto = PhotoImage(file="images/Binary_shadow.png")
+        self.studentPhoto = PhotoImage(file="images/newStudent.png")
+        self.detailPhoto = PhotoImage(file="images/Detail.png")
+        self.attendancePhoto = PhotoImage(file="images/attendance.png")
         # banner frame
         banner_frame = Frame(self.root, bg='#49a0ae', )
         banner_frame.place(relwidth=1, y=0, height=50)
@@ -22,37 +24,37 @@ class Admin_Page:
         btn_frame2.place(relwidth=1, y=380, height=240)
 
 
-        addStudentButton = Button(btn_frame1, image=self.linearPhoto, command=self.addStudentClicked, border=2, height=190,
+        addStudentButton = Button(btn_frame1, image=self.studentPhoto, command=self.addStudentClicked, border=0, height=190,
                               width=341)
         addStudentButton.place(relx=0.2, rely=0.5, anchor=CENTER)
 
 
-        testButton = Button(btn_frame1, image=self.linearPhoto, command=self.addStudentClicked, border=2,
+        testButton = Button(btn_frame1, image=self.studentPhoto, command=self.addStudentClicked, border=0,
                                   height=190,
                                   width=341)
         testButton.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-        checkDetailButton = Button(btn_frame1, image=self.linearPhoto, command=self.addStudentClicked, border=2,
+        checkDetailButton = Button(btn_frame1, image=self.detailPhoto, command=self.addStudentClicked, border=0,
                                   height=190,
                                   width=341)
         checkDetailButton.place(relx=0.8, rely=0.5, anchor=CENTER)
 
 
 
-        addStudentButton = Button(btn_frame2, image=self.linearPhoto, command=self.addStudentClicked, border=2,
+        addUserButton = Button(btn_frame2, image=self.studentPhoto, command=self.addStudentClicked, border=0,
                                   height=190,
                                   width=341)
-        addStudentButton.place(relx=0.8, rely=0.5, anchor=CENTER)
+        addUserButton.place(relx=0.8, rely=0.5, anchor=CENTER)
 
 
-        testButton = Button(btn_frame2, image=self.linearPhoto, command=self.addStudentClicked, border=2,
+        checkAttendanceButton = Button(btn_frame2, image=self.attendancePhoto, command=self.addStudentClicked, border=0,
                             height=190,
                             width=341)
-        testButton.place(relx=0.5, rely=0.5, anchor=CENTER)
+        checkAttendanceButton.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-        checkDetailButton = Button(btn_frame2, image=self.linearPhoto, command=self.addStudentClicked, border=2,
+        checkDetailButton = Button(btn_frame2, image=self.studentPhoto, command=self.addStudentClicked, border=0,
                                    height=190,
                                    width=341)
         checkDetailButton.place(relx=0.2, rely=0.5, anchor=CENTER)
