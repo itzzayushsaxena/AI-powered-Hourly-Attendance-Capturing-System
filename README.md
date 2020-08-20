@@ -10,3 +10,8 @@
 ## Known Bugs
 
 #### ...
+
+## Pending Work
+
+#### 1. Connect Database
+#### 
