@@ -2,7 +2,10 @@
 
 ## Requirements
 
-### python version >= 3
+#### python version >= 3
+#### pip version==20.0.2
+#### PyMySQL==0.10.0
+
 
 ## Known Bugs
 
