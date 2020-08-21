@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
+import pymysql
 
 class Main:
-
 
     def __init__(self,root):
         print(root)
@@ -11,9 +11,21 @@ class Main:
         # self.root.geometry('1200x900')
         self.root.state('zoomed')
         self.root.minsize()
+
         self.create_widgets()
 
+
+    def close(self):
+        root.destroy()
+
+
     def create_widgets(self):
+
+        ## Variables
+        self.user_id_var = StringVar()
+        self.user_pass_var = StringVar()
+        self.admin_id_var = StringVar()
+        self.admin_pass_var = StringVar()
 
         #banner frame
         banner_frame = Frame(self.root, bg='#49a0ae', )
@@ -70,13 +82,13 @@ class Main:
         user_id = Label(login_frame, text='UserName', font=('Goudy old style', 15, 'bold'), fg='gray',
                         bg='white')
         user_id.place(x=90, y=140)
-        self.id_field = Entry(login_frame, font=('times new roman', 15), bg='lightgray')
+        self.id_field = Entry(login_frame, textvariable=self.user_id_var, font=('times new roman', 15), bg='lightgray')
         self.id_field.place(x=90, y=170, width=350, height=35)
 
         password = Label(login_frame, text='Password', font=('Goudy old style', 15, 'bold'), fg='gray',
                          bg='white')
         password.place(x=90, y=210)
-        self.password_field = Entry(login_frame, show="*", font=('times new roman', 15), bg='lightgray')
+        self.password_field = Entry(login_frame, textvariable=self.user_pass_var, show="*", font=('times new roman', 15), bg='lightgray')
         self.password_field.place(x=90, y=240, width=350, height=35)
 
         forget_btn = Button(login_frame, text='Forget Password?', bg='white', fg='#d77337', bd=0,
@@ -87,6 +99,7 @@ class Main:
                            font=('times new roman', 20), activebackground='#d77337', activeforeground='white',
                            cursor='hand2', command=self.user_submit_clicked)
         login_btn.place(x=90, y=350, width=100, height=35)
+        self.user.protocol("WM_DELETE_WINDOW", self.close)
 
     def admin_window(self):
         self.root.withdraw()
@@ -123,13 +136,13 @@ class Main:
         user_id = Label(login_frame, text='AdminName', font=('Goudy old style', 15, 'bold'), fg='gray',
                         bg='white')
         user_id.place(x=90, y=140)
-        self.id_field = Entry(login_frame, font=('times new roman', 15), bg='lightgray')
+        self.id_field = Entry(login_frame, textvariable=self.admin_id_var, font=('times new roman', 15), bg='lightgray')
         self.id_field.place(x=90, y=170, width=350, height=35)
 
         password = Label(login_frame, text='Password', font=('Goudy old style', 15, 'bold'), fg='gray',
                          bg='white')
         password.place(x=90, y=210)
-        self.password_field = Entry(login_frame, show="*", font=('times new roman', 15), bg='lightgray')
+        self.password_field = Entry(login_frame, textvariable=self.admin_pass_var, show="*", font=('times new roman', 15), bg='lightgray')
         self.password_field.place(x=90, y=240, width=350, height=35)
 
         forget_btn = Button(login_frame, text='Forget Password?', bg='white', fg='#d77337', bd=0,
@@ -140,6 +153,7 @@ class Main:
                            font=('times new roman', 20), activebackground='#d77337', activeforeground='white',
                            cursor='hand2', command=self.admin_submit_clicked)
         login_btn.place(x=90, y=350, width=100, height=35)
+        self.admin.protocol("WM_DELETE_WINDOW", self.close)
 
     def user_backClicked(self):
         self.user.withdraw()
@@ -157,18 +171,65 @@ class Main:
 
             messagebox.showerror("Error", "All Fields Are Required!!", parent=self.user)
         else:
-            print(self.id_field.get(), self.password_field.get())
-            self.root.destroy()
-            import user_page
+            try:
+                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+                cursor = con.cursor()
+                if cursor.execute("select username,password from register where usertype=%s and username=%s and password=%s",
+                                  (
+                                          'Teacher',
+                                          self.id_field.get(),
+                                          self.password_field.get()
+                                  )):
+                    self.root.destroy()
+                    import user_page
+                else:
+                    messagebox.showerror("Error", "UserName Or Password is Incorrect", parent=self.user)
+                    self.user_clear()
+            except Exception as ex:
+                messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.user)
+            # print(cursor.execute("select username from register where usertype=%s and username=%s", ('Teacher', self.id_field.get())))
+            # print(self.id_field.get(), self.password_field.get())
+
 
 
     def admin_submit_clicked(self):
+        if self.id_field.get() == "" or self.password_field.get() == "":
 
-        self.root.destroy()
-        import admin_page
+            messagebox.showerror("Error", "All Fields Are Required!!", parent=self.admin)
+        else:
+            try:
+                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+                cursor = con.cursor()
+                if cursor.execute("select username,password from register where usertype=%s and username=%s and password=%s",
+                                  (
+                                          'Admin',
+                                          self.id_field.get(),
+                                          self.password_field.get()
+                                  )):
+                    self.root.destroy()
+                    import admin_page
+                else:
 
+                    messagebox.showerror("Error", "AdminName Or Password is Incorrect", parent=self.admin)
+                    self.admin_clear()
+
+            except Exception as ex:
+                messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.admin)
+
+
+    def user_clear(self):
+        self.user_id_var.set('')
+        self.user_pass_var.set('')
+
+    def admin_clear(self):
+        self.admin_id_var.set('')
+        self.admin_pass_var.set('')
 
 root = Tk()
+
 print(root)
 obj = Main(root)
+# self.user.protocol("WM_DELETE_WINDOW", root.destroy)
+# self.admin.protocol("WM_DELETE_WINDOW", root.destroy)
+# root.protocol("WM_DELETE_WINDOW", obj.close)
 root.mainloop()

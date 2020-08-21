@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import pymysql
 import datetime
-
+import base64
 
 class User_Register:
 
@@ -16,6 +17,10 @@ class User_Register:
     def create_widgets(self):
 
 
+        ###Variables
+        self.user_id_var=StringVar()
+        self.user_pass_var=StringVar()
+        self.searchby_usertype_var = StringVar()
 
         # banner frame
         banner_frame = Frame(self.add_user, bg='#49a0ae', )
@@ -28,8 +33,8 @@ class User_Register:
         self.entry_frame = Frame(self.add_user, bg='white', )
         self.entry_frame.place(x=20 , y=80, width=550, height=450)
 
-        backButton = Button(self.entry_frame, image=self.back, command=self.backClicked, border=0, height=60,
-                            width=60, cursor='hand2', bg='white')
+        backButton = Button(self.entry_frame, image=self.back, command=self.backClicked, border=0, height=65,
+                            width=65, cursor='hand2', bg='white', activebackground='white')
         backButton.place(x=20, y=20)
 
         sub_banner_frame = Frame(self.entry_frame, bg='#49a0ae', )
@@ -41,20 +46,20 @@ class User_Register:
         user_id = Label(self.entry_frame, text='Set UserName', font=('Goudy old style', 15, 'bold'), fg='gray',
                         bg='white')
         user_id.place(x=90, y=140)
-        self.id_field = Entry(self.entry_frame, font=('times new roman', 15), bg='lightgray')
+        self.id_field = Entry(self.entry_frame, textvariable=self.user_id_var, font=('times new roman', 15), bg='lightgray')
         self.id_field.place(x=90, y=170, width=350, height=35)
 
         password = Label(self.entry_frame, text='Set Password', font=('Goudy old style', 15, 'bold'), fg='gray',
                          bg='white')
         password.place(x=90, y=210)
-        self.password_field = Entry(self.entry_frame,  font=('times new roman', 15), bg='lightgray')
+        self.password_field = Entry(self.entry_frame, textvariable=self.user_pass_var, font=('times new roman', 15), bg='lightgray')
         self.password_field.place(x=90, y=240, width=350, height=35)
 
         user_type = Label(self.entry_frame, text='User Type', font=('Goudy old style', 15, 'bold'), fg='gray', bg='white')
         user_type.place(x=90, y=280)
-        self.user_type_chkbox = ttk.Combobox(self.entry_frame, font=('times new roman', 15), state='readonly')
-        self.user_type_chkbox['values']=("Admin", "Teacher")
-        self.user_type_chkbox.place(x=90, y=310, width=200, height=35)
+        self.user_type_combox = ttk.Combobox(self.entry_frame, font=('times new roman', 15), state='readonly')
+        self.user_type_combox['values']=("Admin", "Teacher")
+        self.user_type_combox.place(x=90, y=310, width=200, height=35)
 
 
 
@@ -69,17 +74,17 @@ class User_Register:
 
         del_btn = Button(self.btn_frame, text='Delete User', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
-                         cursor='hand2', command=self.manage_user_submit_clicked)
+                         cursor='hand2', command=self.delete_data)
         del_btn.place(x=160, y=10, width=100, height=35)
 
-        edit_btn = Button(self.btn_frame, text='Edit Data', bg='#49a0ae', fg='white',
+        edit_btn = Button(self.btn_frame, text='Update Data', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
-                         cursor='hand2', command=self.manage_user_submit_clicked)
+                         cursor='hand2', command=self.update_data)
         edit_btn.place(x=280, y=10, width=100, height=35)
 
         clr_btn = Button(self.btn_frame, text='Clear Data', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
-                         cursor='hand2', command=self.manage_user_submit_clicked)
+                         cursor='hand2', command=self.clear)
         clr_btn.place(x=400, y=10, width=100, height=35)
 
 
@@ -101,18 +106,18 @@ class User_Register:
         user_type = Label(self.data_frame, text='User Type', font=('Goudy old style', 17), fg='gray',
                           bg='white')
         user_type.place(x=170, y=96)
-        self.user_type_combox = ttk.Combobox(self.data_frame, font=('times new roman', 15),  state='readonly')
-        self.user_type_combox['values'] = ("Admin", "Teacher")
-        self.user_type_combox.place(x=280, y=96, width=100, height=30,)
+        self.search_user_type_combox = ttk.Combobox(self.data_frame, textvariable=self.searchby_usertype_var, font=('times new roman', 15),  state='readonly')
+        self.search_user_type_combox['values'] = ("Admin", "Teacher")
+        self.search_user_type_combox.place(x=280, y=96, width=100, height=30,)
 
         search_btn = Button(self.data_frame, text='Search', bg='#49a0ae', fg='white',
                          font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
-                         cursor='hand2', command=self.manage_user_submit_clicked)
+                         cursor='hand2', command=self.search)
         search_btn.place(x=400, y=96, width=60, height=35)
 
         show_all_btn = Button(self.data_frame, text='Show All', bg='#49a0ae', fg='white',
                             font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
-                            cursor='hand2', command=self.manage_user_submit_clicked)
+                            cursor='hand2', command=self.fetch_data)
         show_all_btn.place(x=490, y=96, width=60, height=35)
 
 
@@ -122,32 +127,137 @@ class User_Register:
 
         scroll_horizon = Scrollbar(table_frame, orient=HORIZONTAL)
         scroll_vertical = Scrollbar(table_frame, orient=VERTICAL)
-        data_table = ttk.Treeview(table_frame,columns=("no", "id", "doj", "type"),xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
+        self.data_table = ttk.Treeview(table_frame,columns=("no", "id", "doj", "type"), xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
         scroll_horizon.pack(side=BOTTOM, fill=X)
         scroll_vertical.pack(side=RIGHT, fill=Y)
-        scroll_horizon.config(command=data_table.xview)
-        scroll_vertical.config(command=data_table.yview)
-        data_table.heading("no", text="No.")
-        data_table.column("no", width=90)
-        data_table.heading("id", text="User Name")
-        data_table.column("id", width=250)
-        data_table.heading("doj", text="Date Of Joining")
-        data_table.column("doj", width=150)
-        data_table.heading("type", text="User Type")
-        data_table['show'] = 'headings'
-        data_table.pack(fill=BOTH, expand=1)
+        scroll_horizon.config(command=self.data_table.xview)
+        scroll_vertical.config(command=self.data_table.yview)
+        self.data_table.heading("no", text="No.")
+        self.data_table.column("no", width=90)
+        self.data_table.heading("id", text="User Name")
+        self.data_table.column("id", width=250)
+        self.data_table.heading("doj", text="Date Of Joining")
+        self.data_table.column("doj", width=150)
+        self.data_table.heading("type", text="User Type")
+        self.data_table['show'] = 'headings'
+        self.data_table.pack(fill=BOTH, expand=1)
+
+        ##get the selected data from table to fields.
+        self.data_table.bind('<ButtonRelease-1>', self.get_selection)
+
+        ##fetch data from register
+
+        self.fetch_data()
 
     def add_user_submit_clicked(self):
+        if self.id_field.get() == '' or self.user_type_combox.get() == '' or self.password_field.get() == '':
+            messagebox.showerror("Error", "All field Are Required To Add User", parent=self.entry_frame)
+        else:
+            # try:
+            # print(self.id_field.get(), self.password_field.get(), self.user_type_combox.get(), datetime.datetime.now().strftime('%Y-%m-%d'))
+            con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+            cursor = con.cursor()
+            if cursor.execute("select username from register where username=%s", self.id_field.get()):
+                messagebox.showerror("Error", "User Already Exist, Try Different Username")
+            else:
+                cursor.execute("insert into register(username,date,usertype,password) values(%s,%s,%s,%s)",
+                               (
+                                   self.id_field.get(),
+                                   datetime.datetime.now().strftime('%Y-%m-%d'),
+                                   self.user_type_combox.get(),
+                                   self.password_field.get()
+                               ))
+
+                con.commit()
+                self.fetch_data()
+                self.clear()
+                con.close()
+                ### base64.b64encode (pass)
+                ### base64.b64decode (pass)
+            # except Exception as ex:
+            #
+            #     messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n User Already Exist, Try Different Username")
+            #     self.clear()
+
+
+    def fetch_data(self):
         con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
         cursor = con.cursor()
-        cursor.execute("insert into register values(%s,%s,%s,%s)",
-                       (
-                           self.id_field.get(),
-                           self.password_field.get(),
-                           datetime.datetime.now().strftime('%Y-%m-%d'),
-                           self.user_type_chkbox.get()
-                       ))
-        con.commit()
+        cursor.execute("select * from register")
+        rows=cursor.fetchall()
+        if len(rows)!=0:
+            self.data_table.delete(*self.data_table.get_children())
+            for row in rows:
+                self.data_table.insert('', END, values=row)
+                con.commit()
+        con.close()
+
+    def clear(self):
+        self.user_id_var.set('')
+        self.user_type_combox.set('')
+        self.user_pass_var.set('')
+
+    #event will contain the object of action
+    def get_selection(self, event):
+        selection_row = self.data_table.focus()
+        contents = self.data_table.item(selection_row)
+        self.row = contents['values']
+        # print(row)
+        self.user_id_var.set(self.row[1])
+        self.user_type_combox.set(self.row[3])
+        self.user_pass_var.set(self.row[4])
+
+    def update_data(self):
+
+        if self.id_field.get() == '' or self.user_type_combox.get() == '' or self.password_field.get() == '':
+            messagebox.showerror("Error", "Select User From Table To Update", parent=self.entry_frame)
+        else:
+            try:
+                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+                cursor = con.cursor()
+                cursor.execute("update register set username=%s, date=%s, usertype=%s, password=%s where reg_id=%s",
+                               (
+                                   self.id_field.get(),
+                                   datetime.datetime.now().strftime('%Y-%m-%d'),
+                                   self.user_type_combox.get(),
+                                   self.password_field.get(),
+                                   self.row[0]
+                               ))
+                con.commit()
+                self.fetch_data()
+                self.clear()
+                con.close()
+            except Exception as ex:
+                messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n Select User From Table To Update")
+                self.clear()
+
+    def delete_data(self):
+        if self.id_field.get() == '' or self.user_type_combox.get() == '' or self.password_field.get() == '':
+            messagebox.showerror("Error", "Select User From Table To Delete", parent=self.entry_frame)
+        else:
+            try:
+                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+                cursor = con.cursor()
+                cursor.execute("delete from register where reg_id=%s", self.row[0])
+                con.commit()
+                con.close()
+                self.fetch_data()
+                self.clear()
+            except Exception as ex:
+                messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n Select User From Table To Delete")
+                self.clear()
+
+
+    def search(self):
+        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+        cursor = con.cursor()
+        cursor.execute("select * from register where usertype=%s", self.searchby_usertype_var.get())
+        rows = cursor.fetchall()
+        if len(rows)!=0:
+            self.data_table.delete(*self.data_table.get_children())
+            for row in rows:
+                self.data_table.insert('', END, values=row)
+            con.commit()
         con.close()
 
     def manage_user_submit_clicked(self):
