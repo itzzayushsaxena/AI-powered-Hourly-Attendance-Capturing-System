@@ -4,7 +4,7 @@ import pymysql
 
 class Main:
 
-    def __init__(self,root):
+    def __init__(self, root):
         print(root)
         self.root=root
         self.root.title("AI-PHACS | Developed By : Sudip, Ayush, Bhavyesh, Preet, Jay | MiniDeveloper")
@@ -20,6 +20,8 @@ class Main:
 
 
     def create_widgets(self):
+        self.AdminPhoto = PhotoImage(file="images/Admin.png", master=self.root)
+        self.UserPhoto = PhotoImage(file="images/User2.png", master=self.root)
 
         ## Variables
         self.user_id_var = StringVar()
@@ -33,16 +35,14 @@ class Main:
         banner_title = Label(banner_frame, text='Home Page', font=('Impact', 20, 'bold'), bg='#49a0ae', fg='white')
         banner_title.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-        self.normal_user = Button(root, text="USER",font=("times new roman", 15, 'bold'), bg='#49a0ae', fg='white',
-                                  activebackground='#49a0ae', activeforeground='white', cursor='hand2',
-                                  command=self.user_window)
-        self.normal_user.place(relx=0.4, rely=0.5, anchor=CENTER,width=100,height=80)
+        self.normal_user = Button(root,  image=self.UserPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0
+                                 , cursor='hand2',command=self.user_window)
+        self.normal_user.place(relx=0.4, rely=0.5, anchor=CENTER,width=430,height=200)
 
 
-        self.admin = Button(root, text="Admin", font=("times new roman", 15, 'bold'), bg='#49a0ae', fg='white',
-                            activebackground='#49a0ae', activeforeground='white', cursor='hand2',
-                            command=self.admin_window)
-        self.admin.place(relx=0.6, rely=0.5, anchor=CENTER,width=100,height=80)
+        self.admin = Button(root,  image=self.AdminPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0,
+                             cursor='hand2', command=self.admin_window)
+        self.admin.place(relx=0.6, rely=0.5, anchor=CENTER, width=430 , height=200)
 
     def user_window(self):
 
@@ -52,10 +52,10 @@ class Main:
         self.user.title("AI-PHACS | User Login Page")
         self.user.state('zoomed')
         # self.user.geometry("1000x900")
-        self.bg = PhotoImage(file="images/login-page-background.png")
+        self.bg = PhotoImage(file="images/login-page-background.png", master=self.user)
         self.bg_image = Label(self.user, image=self.bg).place(x=0, y=0, relwidth=1, relheight=1)
-        self.back = PhotoImage(file="images/back.png")
-        self.backPhoto = PhotoImage(file="images/back.png")
+        self.back = PhotoImage(file="images/back.png", master=self.user)
+
         # import user_login
         # print(user)
         backButton = Button(self.user, image=self.back, command=self.user_backClicked, border=0, height=60,
@@ -107,10 +107,10 @@ class Main:
         self.admin = Toplevel(root)
         self.admin.title("AI-PHACS | Admin Login Page")
         self.admin.state('zoomed')
-        self.bg = PhotoImage(file="images/login-page-background.png")
+        self.bg = PhotoImage(file="images/login-page-background.png", master=self.admin)
         self.bg_image = Label(self.admin, image=self.bg).place(x=0, y=0, relwidth=1, relheight=1)
 
-        self.back = PhotoImage(file="images/back.png")
+        self.back = PhotoImage(file="images/back.png", master=self.admin)
         backButton = Button(self.admin, image=self.back, command=self.admin_backClicked, border=0, height=60,
                             width=60, cursor='hand2',)
         backButton.place(x=20, y=90)
@@ -187,6 +187,7 @@ class Main:
                     self.user_clear()
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.user)
+                self.user_clear()
             # print(cursor.execute("select username from register where usertype=%s and username=%s", ('Teacher', self.id_field.get())))
             # print(self.id_field.get(), self.password_field.get())
 
@@ -201,11 +202,7 @@ class Main:
                 con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
                 cursor = con.cursor()
                 if cursor.execute("select username,password from register where usertype=%s and username=%s and password=%s",
-                                  (
-                                          'Admin',
-                                          self.id_field.get(),
-                                          self.password_field.get()
-                                  )):
+                                  ('Admin', self.id_field.get(), self.password_field.get())):
                     self.root.destroy()
                     import admin_page
                 else:
@@ -215,6 +212,7 @@ class Main:
 
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.admin)
+                self.admin_clear()
 
 
     def user_clear(self):

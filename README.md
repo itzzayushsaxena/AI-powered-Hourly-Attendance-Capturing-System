@@ -1,30 +1,37 @@
 # AI-powered-Hourly-Attendance-Capturing-System
 
-##Technology Used
+## **->Technology Used**
 
 #### Language - python 3.8
 #### GUI Toolkit - tkinter
 #### Database - mysql
 
-## Requirements
+## **->Found Best Solution For Loop Hole In Technology**
+### **->Tkinter**
+#### 1.When a PhotoImage or other Image object are added to a Tkinter widget, the image won’t always show up.
+#### The problem is that the Tkinter/Tk interface doesn’t handle references to Image objects properly; the Tk widget will hold a reference to the internal object, but Tkinter does not. When Python’s garbage collector discards the Tkinter object, Tkinter tells Tk to release the image. But since the image is in use by a widget, Tk doesn’t destroy it. Not completely. It just blanks the image, making it completely transparent…    
+#### Solution : Just describe the Master Window in which you want image.
+#### example :  
+`self.object = PhotoImage(file="image.png", master=self.window_obj_name)`
+## **->Requirements**
 
 #### python version >= 3
 #### pip version==20.0.2
 #### PyMySQL==0.10.0
 
 
-## Known Bugs
+## **->Known Bugs**
 
 #### ...
 
-## Pending Work
+## **->Pending Work**
 
 #### 1. Fully  Database Connection
 #### 2. User Page  
 #### 3. Connect Admin & Add_User Page with BackButton
 #### 4. Python File to Recognize Faces
 
-## Completed Work
+## **->Completed Work**
 
 #### 1. Main Page Design
 #### 2. User & Admin Login Page Design
@@ -32,3 +39,10 @@
 #### 4. Admin Page -> Add_User Page Design
 #### 5. Add_User Page Backend & Database
 #### 6. User_login & Admin_login Validation 
+
+## **->Reference**
+
+#### 1. https://docs.python.org/3/
+#### 2. https://docs.python.org/3/library/tkinter.html
+#### 3. https://stackoverflow.com/
+#### 4. https://icons8.com/icons/
