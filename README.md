@@ -3,7 +3,7 @@
 ## **->Technology Used**
 
 #### Language - python 3.8
-#### GUI Toolkit - tkinter
+#### GUI Toolkit - tkinter, ttk
 #### Database - mysql
 
 ## **->Found Best Solution For Loop Hole In Technology**
@@ -28,7 +28,7 @@
 
 #### 1. Fully  Database Connection
 #### 2. User Page  
-#### 3. Connect Admin & Add_User Page with BackButton
+#### 3. How backend will Work??
 #### 4. Python File to Recognize Faces
 
 ## **->Completed Work**
@@ -39,6 +39,11 @@
 #### 4. Admin Page -> Add_User Page Design
 #### 5. Add_User Page Backend & Database
 #### 6. User_login & Admin_login Validation 
+#### 7. Connect Admin & Add_User Page with BackButton
+#### 8. edited all pngs
+#### 9. Admin Page -> Add_Student Page Design
+#### 10. Admin Page -> check_Detail Page Design
+#### 11. Admin Page -> check_Attendance Page Design
 
 ## **->Reference**
 
@@ -46,3 +51,11 @@
 #### 2. https://docs.python.org/3/library/tkinter.html
 #### 3. https://stackoverflow.com/
 #### 4. https://icons8.com/icons/
+
+## **->Team & Role**
+
+#### Karmakar Sudip S. ->
+#### Bherwani Bhavyesh J. ->
+#### Ayush Saxena ->  
+#### Masrani Jay H. ->  
+#### Donda Preet T. ->

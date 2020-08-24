@@ -1,39 +1,35 @@
 from tkinter import *
+from tkinter import ttk
+import os
+
+
+class Admin_Page:
+    def __init__(self, root):
+
+
+        self.root = root
+
+        self.current_files = None
+
+
+        # define options for opening or saving a file
+        self.file_opt = options = {}
+        options['defaultextension'] = '.txt'
+        options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        options['initialdir'] = os.path.expanduser("~")
+        options['parent'] = root
+        options['title'] = 'Select files to annotate.'
+
+        self.file_selector_button = ttk.Button(self.root, text=u"select file(s)", )
+        self.label = ttk.Label(self.root, text=u"selected file(s):")
+        self.fa_search = PhotoImage(
+            file=os.path.join(self.root.resource_dir, "images", "fa_search_24_24.gif"))
+        self.file_selector_button.config(image=self.fa_search, compound=LEFT)
+
+        self.scrollbar = ttk.Scrollbar(self.root)
+        self.selected_files = Listbox(self.root, yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.selected_files.yview)
+
 root = Tk()
-
-def update_options_B(*args):
-    countries = data[variable_a.get()]
-    variable_b.set(countries[0])
-    menu = optionmenu_b['menu']
-    menu.delete(0, 'end')
-    for country in countries:
-        menu.add_command(label=country, command=lambda nation=country: variable_b.set(nation))
-
-def update_options_C(*args):
-    cities = data2[variable_b.get()]
-    variable_c.set(cities[0])
-    menu = optionmenu_c['menu']
-    menu.delete(0, "end")
-    for city in cities:
-        menu.add_command(label=city, command=lambda nation=city: variable_c.set(nation))
-
-
-data = {'Asia': ['Japan', 'China', 'Malasia'],'Europe': ['Germany', 'France', 'Switzerland'], 'Africa': ['Nigeria', 'Kenya', 'Ethiopia']}
-data2 = {'Japan': ["jiustu", "kamikaz", "Tokyo"], 'China': ["Shaigon", "Hong Kong"], 'Malasia': ["tiramusto", "quala lopour"], 'Germany': ["Dusseldorf", "Berlin", "Hambourg"], 'France': ["Paris", "Lille"], 'Switzerland': ["Biern", "Bonn"], 'Nigeria': ['Nigeria1', 'Nigeria3'], 'Kenya': ["Keny West", "Notorious"], 'Ethiopia': ["Etanpi", "Neeandertaal"]}
-variable_a = StringVar()
-variable_b = StringVar()
-variable_c = StringVar()
-
-variable_a.trace('w', update_options_B)
-variable_b.trace('w', update_options_C)
-optionmenu_a = OptionMenu(root, variable_a, *data.keys())
-optionmenu_b = OptionMenu(root, variable_b, '')
-optionmenu_c = OptionMenu(root, variable_c, '')
-
-variable_a.set('Asia')
-optionmenu_a.pack()
-optionmenu_b.pack()
-optionmenu_c.pack()
-
-
+obj = Admin_Page(root,)
 root.mainloop()
