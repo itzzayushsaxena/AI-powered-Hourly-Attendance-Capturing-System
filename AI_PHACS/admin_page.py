@@ -14,37 +14,37 @@ class Admin_Page:
         self.create_widgets()
 
     def create_widgets(self):
-        self.trainingPhoto = PhotoImage(file="images/Start Training2.png", master=self.admin_page)
-        self.studentPhoto = PhotoImage(file="images/Add Student2.png", master=self.admin_page)
-        self.userPhoto = PhotoImage(file="images/Add User2.png", master=self.admin_page)
-        self.detailPhoto = PhotoImage(file="images/Check Details2.png", master=self.admin_page)
-        self.attendancePhoto = PhotoImage(file="images/Check Attendance2.png", master=self.admin_page)
+        self.trainingPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.studentPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.userPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.detailPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.attendancePhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
         self.logoutPhoto = PhotoImage(file="images/logout4.png", master=self.admin_page)
 
 
 
         # banner frame
         self.banner_frame = Frame(self.admin_page, bg='#49a0ae', )
-        self.banner_frame.place(x=310,relwidth=1, y=0, height=50)
+        self.banner_frame.place(x=155, relwidth=1, y=0, height=50)
         self.banner_title = Label(self.banner_frame, text='Admin | Add Student Page',
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
         logout_label = Label(self.banner_frame, text='Logout ', font=('times new roman', 12, 'bold'), bg='#49a0ae', fg='white')
-        logout_label.place(x=940, y=15)
+        logout_label.place(x=1100, y=15)
         # logout_frame = Frame(self.banner_frame, bg='black', )
         # logout_frame.place(x=930, y=5, width=40,  height= 40)
         logoutButton = Button(self.banner_frame, image=self.logoutPhoto, command=self.logoutClicked, border=0,
                               height=45,
                               width=45, cursor='hand2', bg='#49a0ae', activebackground='#49a0ae',)
-        logoutButton.place(x=990, y=5)
+        logoutButton.place(x=1150, y=5)
 
         ###### FRAMES
 
         self.btn_frame = Frame(self.admin_page, bg=None)
-        self.btn_frame.place(x=5, relheight=1, width=300)
+        self.btn_frame.place(x=5, relheight=1, width=150)
 
-        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
+        self.changeable_frame = Frame(self.admin_page, bg='white')
         self.changeable_frame.place(x=310,  y=55, height=680, width=1050)
 
         self.draw_add_student()
@@ -52,36 +52,42 @@ class Admin_Page:
 
 
     def draw_add_student(self):
+        # sep = ttk.Separator(self.btn_frame).place(x=0, y=100, relwidth=1)
+        # sep.pack(side="left", fill="x", padx=4, pady=4, expand=1)
+        # sep = ttk.Style()
+        # sep.configure('TSeparator', background='black')
 
+        self.checkAttendanceButton = Button(self.btn_frame, image=self.attendancePhoto,
+                                            command=self.checkAttendanceClicked,
+                                            border=0,
+                                            height=100, width=100, cursor='hand2',)
+        self.checkAttendanceButton.place(relx=0.5, rely=0.1, anchor=CENTER)
 
-        self.addStudentButton = Button(self.btn_frame, image=self.studentPhoto, command=self.addStudentClicked, border=0,
-                                  height=140,
-                                  width=341, cursor='hand2', state='disable', )
-        self.addStudentButton.place(relx=0.5, rely=0.1, anchor=CENTER)
-
-        self.trainButton = Button(self.btn_frame, image=self.trainingPhoto, command=self.trainButtonClicked, border=0,
-                             height=140, width=341, cursor='hand2', )
-        self.trainButton.place(relx=0.5, rely=0.3, anchor=CENTER)
-
-        self.checkDetailButton = Button(self.btn_frame, image=self.detailPhoto, command=self.checkDetailClicked, border=0,
-                                   height=140, width=341, cursor='hand2', )
-        self.checkDetailButton.place(relx=0.5, rely=0.5, anchor=CENTER)
 
         self.addUserButton = Button(self.btn_frame, image=self.userPhoto, command=self.addUserClicked, border=0,
-                               height=140, width=341, cursor='hand2', )
-        self.addUserButton.place(relx=0.5, rely=0.70, anchor=CENTER)
+                                    height=100, width=100, cursor='hand2', )
+        self.addUserButton.place(relx=0.5, rely=0.3, anchor=CENTER)
 
-        self.checkAttendanceButton = Button(self.btn_frame, image=self.attendancePhoto, command=self.checkAttendanceClicked,
-                                       border=0,
-                                       height=140, width=341, cursor='hand2', )
-        self.checkAttendanceButton.place(relx=0.5, rely=0.90, anchor=CENTER)
+        self.addStudentButton = Button(self.btn_frame, image=self.studentPhoto, command=self.addStudentClicked, border=0,
+                                  height=100,
+                                  width=100, cursor='hand2', state='disable', )
+        self.addStudentButton.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        self.trainButton = Button(self.btn_frame, image=self.trainingPhoto, command=self.trainButtonClicked, border=0,
+                             height=100, width=100, cursor='hand2', )
+        self.trainButton.place(relx=0.5, rely=0.7, anchor=CENTER)
+
+        self.checkDetailButton = Button(self.btn_frame, image=self.detailPhoto, command=self.checkDetailClicked,
+                                        border=0,
+                                        height=100, width=100, cursor='hand2', )
+        self.checkDetailButton.place(relx=0.5, rely=0.9, anchor=CENTER)
 
 
         self.trainButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
-
+        self.addStudentClicked()
 
 
     def addStudentClicked(self):
@@ -90,14 +96,109 @@ class Admin_Page:
         self.banner_title = Label(self.banner_frame, text='Admin | Add Student Page',
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
-        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
-        self.changeable_frame.place(x=310, y=55, height=680, width=1050)
+        self.changeable_frame = Frame(self.admin_page, bg='white')
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.addStudentButton['state'] = 'disable'
         self.trainButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
+
+        # s = ttk.Separator(self.changeable_frame, orient=VERTICAL)
+        # s.pack(side=TOP, fill="y", padx=345, pady=177)
+
+        self.add_student_frame = Frame(self.changeable_frame, bg='white', bd=4, relief=RIDGE)
+        self.add_student_frame.place(x=5, y=5, height=670, width=1190)
+        self.upload_Photo = PhotoImage(file="images/student_image400.png", master=self.add_student_frame)
+
+        student_name = Label(self.add_student_frame, text='Student Name ', font=('Goudy old style', 15, 'bold'),
+                             fg='gray',
+                             bg='white')
+        student_name.place(x=135, y=60)
+        self.name_field = Entry(self.add_student_frame, font=('times new roman', 15), bg='lightgray')
+        self.name_field.place(x=305, y=60, width=250, height=30)
+
+        enroll_no = Label(self.add_student_frame, text='EnRoll No. ', font=('Goudy old style', 15, 'bold'),
+                          fg='gray',
+                          bg='white')
+        enroll_no.place(x=135, y=120)
+        self.enroll_no_field = Entry(self.add_student_frame, font=('times new roman', 15), bg='lightgray')
+        self.enroll_no_field.place(x=305, y=120, width=250, height=30)
+
+        email = Label(self.add_student_frame, text='Email', font=('Goudy old style', 15, 'bold'),
+                      fg='gray',
+                      bg='white')
+        email.place(x=135, y=200)
+        self.email_field = Entry(self.add_student_frame, font=('times new roman', 15), bg='lightgray')
+        self.email_field.place(x=305, y=200, width=250, height=30)
+
+        dob = Label(self.add_student_frame, text='Date Of Birth', font=('Goudy old style', 15, 'bold'),
+                    fg='gray',
+                    bg='white')
+        dob.place(x=135, y=280)
+
+        self.date_text = StringVar()
+        self.date_text.set('DD')
+        self.month_text = StringVar()
+        self.month_text.set('MM')
+        self.year_text = StringVar()
+        self.year_text.set('YYYY')
+        self.date_field = Entry(self.add_student_frame, textvariable=self.date_text, font=('times new roman', 15), bg='lightgray')
+
+        self.date_field.place(x=305, y=280, width=50, height=30)
+
+        slash1 = Label(self.add_student_frame, text='/', font=('Goudy old style', 20), bg='white', fg='gray')
+        slash1.place(x=365, y=276)
+        self.month_field = Entry(self.add_student_frame, textvariable=self.month_text, font=('times new roman', 15), bg='lightgray')
+        self.month_field.place(x=385, y=280, width=50, height=30)
+        slash2 = Label(self.add_student_frame, text='/', font=('Goudy old style', 20), bg='white', fg='gray')
+        slash2.place(x=445, y=276)
+        self.year_field = Entry(self.add_student_frame, textvariable=self.year_text, font=('times new roman', 15), bg='lightgray')
+        self.year_field.place(x=465, y=280, width=90, height=30)
+        self.date_field.bind('<ButtonRelease-1>', self.date_selected)
+        self.month_field.bind('<ButtonRelease-1>', self.month_selected)
+        self.year_field.bind('<ButtonRelease-1>', self.year_selected)
+
+        phone_no = Label(self.add_student_frame, text='Phone Number', font=('Goudy old style', 15, 'bold'),
+                         fg='gray',
+                         bg='white')
+        phone_no.place(x=135, y=360)
+        self.phone_no_field = Entry(self.add_student_frame, font=('times new roman', 15), bg='lightgray')
+        self.phone_no_field.place(x=305, y=360, width=250, height=30)
+
+        address = Label(self.add_student_frame, text='Address', font=('Goudy old style', 15, 'bold'),
+                        fg='gray',
+                        bg='white')
+
+        address.place(x=135, y=420)
+        address_field = Text(self.add_student_frame, width=25, height=4, font=('times new roman', 15),
+                             bg='lightgray')
+        address_field.place(x=305, y=420)
+
+        self.upload_image_frame = Frame(self.add_student_frame,  )
+        self.upload_image_frame.place(x=700, y=110, height=360, width=320,)
+        label = Label(self.upload_image_frame, image=self.upload_Photo, bg='white')
+        label.pack()
+        self.btn_border_frame = Frame(self.upload_image_frame, bg="#F97C14")
+        upload_btn = Button(self.btn_border_frame, text='Upload Image', bd=0, fg='#F97C14',
+                         font=('times new roman', 14, 'bold'), activebackground='#F97C14', activeforeground='white',
+                         cursor='hand2', )
+        upload_btn.pack(fill="both", expand=True, padx=1, pady=1)
+        self.btn_border_frame.place(x=100, y=260, height=30, width=120)
+        # canvas = Canvas(self.add_student_frame, width=300, height=340)
+        # canvas.place(x=580, y=150)
+        # canvas.create_image(0, 0, anchor=NW, image=self.upload_Photo)
+        add_student_submit_btn = Button(self.add_student_frame, text='Add Student', bg='#49a0ae', fg='white',
+                            font=('times new roman', 14, 'bold'), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', )
+        add_student_submit_btn.place(x=475, y=555)
+    def date_selected(self, event):
+        self.date_text.set('')
+    def month_selected(self, event):
+        self.month_text.set('')
+    def year_selected(self, event):
+        self.year_text.set('')
 
 #### ============================================= Training           =============================================#####
 #### ==============================================================================================================#####
@@ -110,7 +211,7 @@ class Admin_Page:
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
         self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
-        self.changeable_frame.place(x=310, y=55, height=680, width=1050)
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.trainButton['state'] = 'disable'
         self.checkAttendanceButton['state'] = 'normal'
@@ -129,15 +230,197 @@ class Admin_Page:
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
-        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
-        self.changeable_frame.place(x=310, y=55, height=680, width=1050)
+        self.changeable_frame = Frame(self.admin_page, bg=None)
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.checkDetailButton['state'] = 'disable'
         self.trainButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.addStudentButton['state'] = 'normal'
+        self.draw_student_detail()
 
+    def draw_student_detail(self):
+        self.detail_searchby_frame = Frame(self.changeable_frame, bg='white')
+        self.detail_searchby_frame.place(x=5, y=5, width=1190, height=50)
+
+        self.detail_data_frame = Frame(self.changeable_frame, bg='white')
+        self.detail_data_frame.place(x=5, y=60, width=1190, height=620)
+
+
+
+        ### Btns
+        student_add_del_btn = Button(self.detail_searchby_frame, text='Delete', bg='#49a0ae', fg='white',
+                                     font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
+                                     cursor='hand2', command=self.detail_delete_data)
+        student_add_del_btn.place(x=30, y=15, width=70, height=22)
+
+        student_add_edit_btn = Button(self.detail_searchby_frame, text='Update', bg='#49a0ae', fg='white',
+                                      font=('times new roman', 12), activebackground='#49a0ae',
+                                      activeforeground='white',
+                                      cursor='hand2', command=self.detail_update_data)
+        student_add_edit_btn.place(x=110, y=15, width=70, height=22)
+
+
+
+
+        ### Search
+
+
+        search = Label(self.detail_searchby_frame, text='Search By :', font=('times new roman', 12), bg='white',
+                       fg='black')
+        search.place(x=330, y=15)
+
+        stream = Label(self.detail_searchby_frame, text='Stream', font=('Goudy old style', 12, 'bold'), fg='gray',
+                       bg='white')
+        stream.place(x=440, y=15)
+
+        department = Label(self.detail_searchby_frame, text='Department', font=('Goudy old style', 12, 'bold'),
+                           fg='gray',
+                           bg='white')
+        department.place(x=690, y=15)
+
+        # dictionary
+
+        self.data = {'Engineering': ["Computer", "Electrical", "Chemical", "Mechanical"], 'xyz': ["xyz1", "zyz2"]}
+        self.variable_a = StringVar()
+        self.variable_b = StringVar()
+
+        self.variable_a.trace('w', self.update_options_B)
+
+        self.optionmenu_a = OptionMenu(self.detail_searchby_frame, self.variable_a, *self.data.keys())
+        self.optionmenu_b = OptionMenu(self.detail_searchby_frame, self.variable_b, '')
+
+        self.variable_a.set('Engineering')
+
+        self.optionmenu_a.place(x=510, y=15, width=150, height=25)
+
+        self.optionmenu_b.place(x=800, y=15, width=150, height=25)
+
+        search_btn = Button(self.detail_searchby_frame, text='Search', bg='#49a0ae', fg='white',
+                            font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', command=self.search)
+        search_btn.place(x=1000, y=15, width=60, height=22)
+
+
+        # Table Frame
+        self.student_table_frame = Frame(self.detail_data_frame, bd=4, relief=RIDGE, bg='white', )
+        self.student_table_frame.place(x=5, y=5, width=1180, height=610)
+
+        scroll_horizon = Scrollbar(self.student_table_frame, orient=HORIZONTAL)
+        scroll_vertical = Scrollbar(self.student_table_frame, orient=VERTICAL)
+        self.student_data_table = ttk.Treeview(self.student_table_frame,
+                                               columns=("enroll_no", "name", "perc", "phno", "email", "dob", "address"),
+                                               xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
+        scroll_horizon.pack(side=BOTTOM, fill=X)
+        scroll_vertical.pack(side=RIGHT, fill=Y)
+        scroll_horizon.config(command=self.student_data_table.xview)
+        scroll_vertical.config(command=self.student_data_table.yview)
+        self.student_data_table.heading("enroll_no", text="EnrollNo.")
+        self.student_data_table.column("enroll_no", width=130)
+        self.student_data_table.heading("name", text="Student Name")
+        self.student_data_table.column("name", width=220)
+        self.student_data_table.heading("perc", text="% Attd..")
+        self.student_data_table.column("perc", width=50)
+        self.student_data_table.heading("phno", text="Phone No.")
+        self.student_data_table.column("phno", width=130)
+        self.student_data_table.heading("email", text="Email")
+        self.student_data_table.column("email", width=160)
+        self.student_data_table.heading("dob", text="Date Of Birth")
+        self.student_data_table.column("dob", width=130)
+        self.student_data_table.heading("address", text="Address")
+        self.student_data_table.column("address", width=220)
+        self.student_data_table['show'] = 'headings'
+        self.student_data_table.pack(fill=BOTH, expand=1)
+
+    def update_options_B(self, *args):
+        countries = self.data[self.variable_a.get()]
+        self.variable_b.set(countries[0])
+        menu = self.optionmenu_b['menu']
+        menu.delete(0, 'end')
+        for country in countries:
+            menu.add_command(label=country, command=lambda nation=country: self.variable_b.set(nation))
+
+    def detail_delete_data(self):
+        messagebox.askyesno("Confirmation", "Are You Sure ? You want to Delete the Selected data.", parent=self.student_table_frame)
+
+    def detail_update_data(self):
+        self.update_page = Toplevel(self.admin_page)
+        self.update_page.title("AI-PHACS | Update Detail")
+        self.update_page.geometry('385x385+80+100')
+
+        self.edit_detail_frame = Frame(self.update_page, bg=None, )
+        self.edit_detail_frame.place(x=5, y=5, width=375, height=375)
+
+        # ### Edit Student
+        #
+        edit_enroll_no = Label(self.edit_detail_frame, text='EnRoll No. ', font=('Goudy old style', 10, 'bold'),
+                               fg='gray',
+                               bg=None)
+        edit_enroll_no.place(x=50, y=10)
+        self.edit_enroll_no_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
+        self.edit_enroll_no_field.place(x=140, y=13, width=170, height=18)
+
+        edit_student_name = Label(self.edit_detail_frame, text='Name ', font=('Goudy old style', 10, 'bold'),
+                                  fg='gray',
+                                  bg=None)
+        edit_student_name.place(x=50, y=50)
+        self.name_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
+        self.name_field.place(x=140, y=53, width=170, height=18)
+        edit_email = Label(self.edit_detail_frame, text='Email', font=('Goudy old style', 10, 'bold'),
+                           fg='gray',
+                           bg=None)
+        edit_email.place(x=50, y=90)
+        self.edit_email_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
+        self.edit_email_field.place(x=140, y=93, width=170, height=18)
+
+        edit_dob = Label(self.edit_detail_frame, text='DOB', font=('Goudy old style', 10, 'bold'),
+                         fg='gray',
+                         bg=None)
+        edit_dob.place(x=50, y=137)
+
+        self.date_field = Entry(self.edit_detail_frame, textvariable=self.date_text, font=('times new roman', 10),
+                                bg='lightgray')
+
+        self.date_field.place(x=140, y=140, width=30, height=18)
+
+        slash1 = Label(self.edit_detail_frame, text='/', font=('Goudy old style', 11), bg=None, fg='gray')
+        slash1.place(x=185, y=137)
+        self.month_field = Entry(self.edit_detail_frame, textvariable=self.month_text, font=('times new roman', 10),
+                                 bg='lightgray')
+        self.month_field.place(x=205, y=140, width=30, height=18)
+        slash2 = Label(self.edit_detail_frame, text='/', font=('Goudy old style', 11), bg=None, fg='gray')
+        slash2.place(x=250, y=137)
+        self.year_field = Entry(self.edit_detail_frame, textvariable=self.year_text, font=('times new roman', 10),
+                                bg='lightgray')
+        self.year_field.place(x=270, y=140, width=40, height=18)
+
+
+        edit_phone_no = Label(self.edit_detail_frame, text='Phone NO.', font=('Goudy old style', 10, 'bold'),
+                              fg='gray',
+                              bg=None)
+        edit_phone_no.place(x=50, y=187)
+        self.edit_phone_no_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
+        self.edit_phone_no_field.place(x=140, y=190, width=170, height=18)
+
+        edit_address = Label(self.edit_detail_frame, text='Address', font=('Goudy old style', 10, 'bold'),
+                             fg='gray',
+                             bg=None)
+
+        edit_address.place(x=50, y=247)
+        edit_address_field = Text(self.edit_detail_frame, width=28, height=3, font=('times new roman', 10),
+                                  bg='lightgray')
+        edit_address_field.place(x=140, y=240)
+
+        apply_btn = Button(self.edit_detail_frame, text='Update', bg='#49a0ae', fg='white',
+                            font=('times new roman', 10), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', command=self.clear)
+        apply_btn.place(x=100, y=330, width=70, height=18)
+
+        cancel_btn = Button(self.edit_detail_frame, text='Cancel', bg='#49a0ae', fg='white',
+                                     font=('times new roman', 10), activebackground='#49a0ae', activeforeground='white',
+                                     cursor='hand2', command=self.clear)
+        cancel_btn.place(x=190, y=330, width=70, height=18)
 
 #### ============================================= USER REGISTRATION  =============================================#####
 #### ==============================================================================================================#####
@@ -153,7 +436,7 @@ class Admin_Page:
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
         self.changeable_frame = Frame(self.admin_page, bg=None)
-        self.changeable_frame.place(x=310, y=55, height=680, width=1050)
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.addUserButton['state'] = 'disable'
         self.trainButton['state'] = 'normal'
@@ -164,10 +447,10 @@ class Admin_Page:
 
     def draw_add_user(self):
         self.manage_user_frame = Frame(self.changeable_frame, bg='white')
-        self.manage_user_frame.place(x=5, y=5, width=1040, height=130)
+        self.manage_user_frame.place(x=5, y=5, width=1190, height=130)
 
         self.user_data_frame = Frame(self.changeable_frame, bg='white')
-        self.user_data_frame.place(x=5, y=140, width=1040, height=545)
+        self.user_data_frame.place(x=5, y=140, width=1190, height=545)
 
         ###Variables
         self.user_id_var = StringVar()
@@ -176,28 +459,28 @@ class Admin_Page:
 
         sub_banner_title = Label(self.manage_user_frame, text='Manage User', font=('Impact', 30, 'bold'), bg='white',
                                  fg='#49a0ae')
-        sub_banner_title.place(relx=0.15, rely=0.3, anchor=CENTER)
+        sub_banner_title.place(relx=0.15, rely=0.5, anchor=CENTER)
 
         user_id = Label(self.manage_user_frame, text='Set UserName', font=('Goudy old style', 12, 'bold'), fg='gray',
                         bg='white')
-        user_id.place(x=350, y=15)
+        user_id.place(x=440, y=15)
         self.id_field = Entry(self.manage_user_frame, textvariable=self.user_id_var, font=('times new roman', 12),
                               bg='lightgray')
-        self.id_field.place(x=350, y=50, width=200, height=22)
+        self.id_field.place(x=440, y=50, width=200, height=22)
 
         password = Label(self.manage_user_frame, text='Set Password', font=('Goudy old style', 12, 'bold'), fg='gray',
                          bg='white')
-        password.place(x=585, y=15)
+        password.place(x=675, y=15)
         self.password_field = Entry(self.manage_user_frame, textvariable=self.user_pass_var, font=('times new roman', 12),
                                     bg='lightgray')
-        self.password_field.place(x=585, y=50, width=200, height=22)
+        self.password_field.place(x=675, y=50, width=200, height=22)
 
         user_type = Label(self.manage_user_frame, text='User Type', font=('Goudy old style', 12, 'bold'), fg='gray',
                           bg='white')
-        user_type.place(x=820, y=15)
+        user_type.place(x=910, y=15)
         self.user_type_combox = ttk.Combobox(self.manage_user_frame, font=('times new roman', 12), state='readonly')
         self.user_type_combox['values'] = ("Admin", "Teacher")
-        self.user_type_combox.place(x=820, y=50, width=150, height=22)
+        self.user_type_combox.place(x=910, y=50, width=150, height=22)
 
         # button_frame
 
@@ -206,35 +489,28 @@ class Admin_Page:
         add_btn = Button(self.manage_user_frame, text='Add User', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
                          cursor='hand2', command=self.add_user_submit_clicked)
-        add_btn.place(x=400, y=85, width=100, height=30)
+        add_btn.place(x=490, y=85, width=100, height=30)
 
         del_btn = Button(self.manage_user_frame, text='Delete User', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
                          cursor='hand2', command=self.delete_data)
-        del_btn.place(x=520, y=85, width=100, height=30)
+        del_btn.place(x=610, y=85, width=100, height=30)
 
         edit_btn = Button(self.manage_user_frame, text='Update Data', bg='#49a0ae', fg='white',
                           font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
                           cursor='hand2', command=self.update_data)
-        edit_btn.place(x=640, y=85, width=100, height=30)
+        edit_btn.place(x=730, y=85, width=100, height=30)
 
         clr_btn = Button(self.manage_user_frame, text='Clear Data', bg='#49a0ae', fg='white',
                          font=('times new roman', 14), activebackground='#49a0ae', activeforeground='white',
                          cursor='hand2', command=self.clear)
-        clr_btn.place(x=760, y=85, width=100, height=30)
-
-        # data frame
+        clr_btn.place(x=850, y=85, width=100, height=30)
 
 
-        data_banner_frame = Frame(self.user_data_frame, bg='#49a0ae', )
-        data_banner_frame.place(relwidth=1, y=0, height=50)
-        data_banner_title = Label(data_banner_frame, text='User Data', font=('times new roman', 20, 'bold'), bg='#49a0ae',
-                                  fg='white')
-        data_banner_title.place(relx=0.5, rely=0.5, anchor=CENTER)
         #search_Frame
 
         self.search_frame = Frame(self.user_data_frame, bg='white', )
-        self.search_frame.place(relwidth=1, y=55, height=50)
+        self.search_frame.place(x=510, relwidth=1, y=10, height=50)
 
         search = Label(self.search_frame, text='Search By :', font=('times new roman', 12), bg='white',
                        fg='black')
@@ -260,7 +536,7 @@ class Admin_Page:
 
         # Table Frame
         table_frame = Frame(self.user_data_frame, bd=4, relief=RIDGE, bg='white')
-        table_frame.place(x=5, y=110, width=1025, height=430)
+        table_frame.place(x=5, y=60, width=1180, height=470)
 
         scroll_horizon = Scrollbar(table_frame, orient=HORIZONTAL)
         scroll_vertical = Scrollbar(table_frame, orient=VERTICAL)

@@ -2,10 +2,9 @@
 
 ## Table of contents
 1. [Requirements](#-requirements)
-2. [Installation](#-installation)
-3. [Technology Used](#-technology-used)
-4. [Found Solution For Loop-Hole In Technology](#-found-best-solution-for-loop-hole-in-technology)
-5. [Want To Contribute ??](#-want-to-contribute-)
+2. [Technology Used](#-technology-used)
+3. [Found Solution For Loop-Hole In Technology](#-found-best-solution-for-loop-hole-in-technology)
+4. [Want To Contribute ??](#-want-to-contribute-)
 5. [Known Bugs](#-known-bugs)
 6. [Timeline](#-work-timeline)
 7. [License](#license)
@@ -15,12 +14,31 @@
 
 
 ## **->Requirements**
-
 #### python version >= 3
-#### pip version==20.0.2
-#### PyMySQL==0.10.0
+#### pip version==20.0.2    
 
-## **->Installation**
+## Setting up and running the Software on your machine.
+#### 1. Make sure you have downloaded & installed python version >= 3, pip version == 20.0.2
+
+#### 2. To download & intall the required python packages run following command in cmd.
+ ```
+pip install -r requirements.txt
+```
+#### 3. After changing directory to ../AI_PHACS in cmd run following command
+```
+main.py
+```
+#### 4. If you don't want to authenticate & authorize yourself again & again to access the admin page or user page you can run following command
+### Note : cmd directory ../AI_PHACS
+```
+admin_page.py
+```
+```
+user_page.py
+```
+ 
+
+
 
 ## **->Technology Used**
 
@@ -39,7 +57,7 @@ self.object = PhotoImage(file="image.png", master=self.window_obj_name)
 ```
 
 ## **->Want To Contribute ??**
-Feel free to contribute to this project. To learn how you could help, read the ["Contributing"](/contributing.md) page.
+#### Feel free to contribute to this project. To learn how you could help, read the ["Contributing"](/contributing.md) page.
 
 
 ## **->Known Bugs**
@@ -81,8 +99,8 @@ Feel free to contribute to this project. To learn how you could help, read the [
 
 ## **->Team & Role**
 
-#### Karmakar Sudip S. ->
-#### Bherwani Bhavyesh J. ->
-#### Ayush Saxena ->  
-#### Masrani Jay H. ->  
-#### Donda Preet T. ->
+#### Karmakar Sudip S. -> Leader, Project Organiser, Technical Skill Person   
+#### Bherwani Bhavyesh J. -> Concept Generator, Technical Skill Person
+#### Ayush Saxena ->  Project Organiser, Technical Skill Person
+#### Masrani Jay H. -> An Analyser, Quality Checker 
+#### Donda Preet T. -> sheets Maker
