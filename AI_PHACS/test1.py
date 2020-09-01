@@ -1,11 +1,10 @@
-import os
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkcalendar import *
 import pymysql
 import datetime
-import re
+
 
 class Admin_Page:
     def __init__(self, root):
@@ -14,16 +13,12 @@ class Admin_Page:
         self.admin_page.state('zoomed')
         self.create_widgets()
 
-    # def connect_database(self):
-    #     self.con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-    #     self.cursor = self.con.cursor()
-
     def create_widgets(self):
-        self.trainingPhoto = PhotoImage(file="images/Start Training2.png", master=self.admin_page)
-        self.studentPhoto = PhotoImage(file="images/Add Student2.png", master=self.admin_page)
-        self.userPhoto = PhotoImage(file="images/Add User2.png", master=self.admin_page)
-        self.detailPhoto = PhotoImage(file="images/Check Details2.png", master=self.admin_page)
-        self.attendancePhoto = PhotoImage(file="images/Check Attendance2.png", master=self.admin_page)
+        self.trainingPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.studentPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.userPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.detailPhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
+        self.attendancePhoto = PhotoImage(file="images/Add Timetable3.png", master=self.admin_page)
         self.logoutPhoto = PhotoImage(file="images/logout4.png", master=self.admin_page)
 
 
@@ -123,13 +118,14 @@ class Admin_Page:
         self.dob_month_field_var.set('MM')
         self.dob_year_field_var = StringVar()
         self.dob_year_field_var.set('YYYY')
+        self.student_gender_var = StringVar()
         self.phone_no_var = StringVar()
-
+        self.student_address_var = StringVar()
 
 
         self.add_student_frame = Frame(self.changeable_frame, bg='white', bd=4, relief=RIDGE)
         self.add_student_frame.place(x=5, y=5, height=670, width=1190)
-        self.upload_Photo = PhotoImage(file="images/Profile_400px.png", master=self.add_student_frame)
+        self.upload_Photo = PhotoImage(file="images/student_image400.png", master=self.add_student_frame)
 
         student_name = Label(self.add_student_frame, text='Student Name ', font=('Goudy old style', 15, 'bold'),
                              fg='gray',
@@ -222,114 +218,21 @@ class Admin_Page:
         self.dob_year_field_var.set('')
 
     def add_student_submit_clicked(self):
-       if self.validate_all_fields():
-            print(self.validate_number_field())
-            if self.validate_number_field():
-                print(self.is_valid_email())
-                if self.is_valid_email():
-                    # self.connect_database()
-                    con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                    cursor = con.cursor()
-                    if cursor.execute("select enroll_no from student where enroll_no=%s", self.enroll_no_field.get()):
-                        messagebox.showerror("Error", "Student With Same Enrollnment No. Exist, Try Different Enrollnment No.")
-                    else:
-                        cursor.execute("insert into student(enroll_no,name,email,dob,gender,phone_no,address)"
-                                            "values(%s,%s,%s,%s,%s,%s,%s)",
-                                       (
-                                           self.enroll_no_field.get(),
-                                           self.name_field.get(),
-                                           self.email_field.get(),
-                                           str(self.year_field.get()) + "/" + str(self.month_field.get()) + "/" + str(self.date_field.get()),
-                                           self.student_gender_combox.get(),
-                                           self.phone_no_field.get(),
-                                           self.address_field.get('1.0', END)
-                                       ))
-
-                        con.commit()
-                        self.add_student_clear()
-                        con.close()
-                        messagebox.showinfo("sucess", "Data Added Sucessfully.")
-       else:
-            print("validation of allFields Fails")
-
-    def validate_all_fields(self):
-        print(self.address_field.get('1.0', END) == '')
-        if self.name_field.get() == '':
-            messagebox.showerror("Error", "Please enter full name to proceed", parent=self.add_student_frame)
-
-        elif self.enroll_no_field.get() == '':
-            messagebox.showerror("Error", "Please enter Enrollnment No. to proceed", parent=self.add_student_frame)
-
-        elif self.email_field.get() == '':
-            messagebox.showerror("Error", "Please enter Email to proceed", parent=self.add_student_frame)
-
-        elif self.student_gender_combox.get() == '':
-            messagebox.showerror("Error", "Please Select Your Gender to proceed", parent=self.add_student_frame)
-
-        elif (self.dob_date_field_var.get() == '' or self.dob_month_field_var.get() == ''
-              or self.dob_year_field_var.get() == ''):
-            messagebox.showerror("Error", "Please enter Date Of Birth to proceed", parent=self.add_student_frame)
-
-        elif self.phone_no_field.get() == '':
-            messagebox.showerror("Error", "Please enter Phone No. to proceed", parent=self.add_student_frame)
-
-        elif self.address_field.get('1.0', END) == '':
-            messagebox.showerror("Error", "Please enter Address to proceed", parent=self.add_student_frame)
-
-        else:
-            return True
-
-    def validate_number_field(self):
-
-        if((self.enroll_no_field.get().isdigit()) and (len(self.enroll_no_field.get()) == 12)):
-            if ((self.phone_no_field.get().isdigit())) and (len(self.phone_no_field.get()) == 10):
-                if((self.date_field.get().isdigit()) and (self.month_field.get().isdigit())
-                        and (self.year_field.get().isdigit()) and (len(self.date_field.get()) == 2)
-                        and (len(self.month_field.get()) == 2) and (len(self.year_field.get()) == 4)):
-                    return True
-                else:
-                    messagebox.showerror("Error", "Please enter Date According To Format to proceed",
-                                         parent=self.add_student_frame)
-
-            else:
-                messagebox.showerror("Error", "Please enter 10 digit Phone No. to proceed",
-                                     parent=self.add_student_frame)
-
-        else:
-            messagebox.showerror("Error", "Please enter 12 digit Enrollnment No. to proceed", parent=self.add_student_frame)
-
-
-    def is_valid_email(self):
-        if len(self.email_field.get()) > 10:
-            if re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.email_field.get()) is not None:
-                return True
-            else:
-                messagebox.showerror("Error", "Please enter valid Email id to proceed", parent=self.add_student_frame)
-                return False
-
-
-
-    def add_student_clear(self):
-        self.student_name_var.set('')
-        self.enroll_no_var.set('')
-        self.student_email_var.set('')
-        self.dob_date_field_var.set('DD')
-        self.dob_month_field_var.set('MM')
-        self.dob_year_field_var.set('YYYY')
-        self.student_gender_combox.set('')
-        self.phone_no_var.set('')
-        self.address_field.delete('1.0', END)
+        if (self.name_field.get() == '' or self.enroll_no_field.get() == '' or self.student_gender_combox.get() == ''
+                or self.dob_date_field_var.get() == '' or self.dob_month_field_var.get() == ''
+                or self.dob_year_field_var.get() == '' or self.phone_no_field.get() == ''
+                or self.address_field.get() == ''):
+            messagebox.showerror("Error", "All field Are Required To Add Student", parent=self.add_student_frame)
 
 
 #### ============================================= Training           =============================================#####
 #### ==============================================================================================================#####
     def trainButtonClicked(self):
-        # os.system('train.py')
         self.changeable_frame.destroy()
         self.banner_title.destroy()
 
         self.banner_title = Label(self.banner_frame, text='Admin | Training Page',
-                                        font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
+                                  font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
         self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
@@ -381,7 +284,7 @@ class Admin_Page:
                                       font=('times new roman', 12), activebackground='#49a0ae',
                                       activeforeground='white',
                                       cursor='hand2', command=self.detail_update_data)
-        student_add_edit_btn.place(x=120, y=15, width=70, height=22)
+        student_add_edit_btn.place(x=110, y=15, width=70, height=22)
 
 
 
@@ -421,13 +324,9 @@ class Admin_Page:
 
         search_btn = Button(self.detail_searchby_frame, text='Search', bg='#49a0ae', fg='white',
                             font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
-                            cursor='hand2', command=self.search_detail)
+                            cursor='hand2', command=self.search)
         search_btn.place(x=1000, y=15, width=60, height=22)
 
-        search_all_btn = Button(self.detail_searchby_frame, text='Show All', bg='#49a0ae', fg='white',
-                            font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
-                            cursor='hand2', command=self.fetch_student_data)
-        search_all_btn.place(x=1080, y=15, width=60, height=22)
 
         # Table Frame
         self.student_table_frame = Frame(self.detail_data_frame, bd=4, relief=RIDGE, bg='white', )
@@ -476,102 +375,43 @@ class Admin_Page:
         for country in countries:
             menu.add_command(label=country, command=lambda nation=country: self.variable_b.set(nation))
 
-    def get_selection_student_data(self, event):
-        selection_row = self.student_data_table.focus()
-        contents = self.student_data_table.item(selection_row)
-        self.student_detail_row = contents['values']
-        # print(self.student_detail_row)
-
+    def get_selection_student_data(self):
+        print("student table")
 
     def fetch_student_data(self):
-        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        cursor = con.cursor()
-        cursor.execute("select * from student")
-        rows = cursor.fetchall()
-        if len(rows) != 0:
-            self.student_data_table.delete(*self.student_data_table.get_children())
-            for row in rows:
-                # print(row)
-                self.student_data_table.insert('', END, values=(row[0], row[1], 0, row[5], row[2], row[4], row[3], row[6]))
-                con.commit()
-        con.close()
+        print("access student table")
 
     def detail_delete_data(self):
-        if hasattr(self, 'student_detail_row'):
-            m = messagebox.askyesno("Confirmation", "Are You Sure ? You want to Delete the Selected data.", parent=self.student_table_frame)
-            # print(m)
-            if m:
-                try:
-                    con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                    cursor = con.cursor()
-                    cursor.execute("delete from student where enroll_no=%s", self.student_detail_row[0])
-                    con.commit()
-                    con.close()
-                    self.fetch_student_data()
-
-                except Exception as ex:
-                    messagebox.showerror("Error",
-                                         f"Action Failed Due To : {str(ex)}")
-        else:
-            messagebox.showerror("Error", "Select student From Table To Delete")
-            return
-
+        messagebox.askyesno("Confirmation", "Are You Sure ? You want to Delete the Selected data.", parent=self.student_table_frame)
 
     def detail_update_data(self):
+        self.update_page = Toplevel(self.admin_page)
+        self.update_page.title("AI-PHACS | Update Detail")
+        self.update_page.geometry('385x385+540+250')
 
-        if hasattr(self, 'student_detail_row'):
-            self.update_page = Toplevel(self.admin_page)
-            self.update_page.title("AI-PHACS | Update Detail")
-            self.update_page.geometry('385x385+540+250')
+        self.edit_detail_frame = Frame(self.update_page, bg=None, )
+        self.edit_detail_frame.place(x=5, y=5, width=375, height=375)
 
-            self.edit_detail_frame = Frame(self.update_page, bg=None, )
-            self.edit_detail_frame.place(x=5, y=5, width=375, height=375)
-
-            ## Variable
-
-            self.edit_enroll_var = StringVar()
-            self.edit_enroll_var.set(self.student_detail_row[0])
-            self.edit_name_var = StringVar()
-            self.edit_name_var.set(self.student_detail_row[1])
-            self.edit_email_var = StringVar()
-            self.edit_email_var.set(self.student_detail_row[4])
-            # print(datetime.datetime.strptime(self.student_detail_row[6], "%Y-%m-%d"))
-            edit_dob = datetime.datetime.strptime(self.student_detail_row[6], "%Y-%m-%d")
-            # print(format(edit_dob.month,'02'))
-            # print(format(edit_dob.day, '02'))
-            self.edit_date_var = StringVar()
-            self.edit_date_var.set(format(edit_dob.day,'02'))
-            self.edit_month_var = StringVar()
-            self.edit_month_var.set(format(edit_dob.month,'02'))
-            self.edit_year_var = StringVar()
-            self.edit_year_var.set(edit_dob.year)
-            self.edit_gender_var = StringVar()
-            self.edit_gender_var.set(self.student_detail_row[5])
-            self.edit_phone_no_var = StringVar()
-            self.edit_phone_no_var.set(self.student_detail_row[3])
-        else:
-            messagebox.showerror("Error", "Select student From Table To Update")
-            return
         # ### Edit Student
         #
         edit_enroll_no = Label(self.edit_detail_frame, text='EnRoll No. ', font=('Goudy old style', 10, 'bold'),
                                fg='gray',
                                bg=None)
         edit_enroll_no.place(x=50, y=10)
-        self.edit_enroll_no_field = Entry(self.edit_detail_frame, textvariable=self.edit_enroll_var, font=('times new roman', 10), bg='lightgray')
+        self.edit_enroll_no_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
         self.edit_enroll_no_field.place(x=140, y=13, width=170, height=18)
 
         edit_student_name = Label(self.edit_detail_frame, text='Name ', font=('Goudy old style', 10, 'bold'),
                                   fg='gray',
                                   bg=None)
         edit_student_name.place(x=50, y=50)
-        self.name_field = Entry(self.edit_detail_frame, textvariable=self.edit_name_var, font=('times new roman', 10), bg='lightgray')
+        self.name_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
         self.name_field.place(x=140, y=53, width=170, height=18)
         edit_email = Label(self.edit_detail_frame, text='Email', font=('Goudy old style', 10, 'bold'),
                            fg='gray',
                            bg=None)
         edit_email.place(x=50, y=90)
-        self.edit_email_field = Entry(self.edit_detail_frame, textvariable=self.edit_email_var, font=('times new roman', 10), bg='lightgray')
+        self.edit_email_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
         self.edit_email_field.place(x=140, y=93, width=170, height=18)
 
 
@@ -581,19 +421,19 @@ class Admin_Page:
                          bg=None)
         edit_dob.place(x=50, y=137)
 
-        self.date_field = Entry(self.edit_detail_frame, textvariable=self.edit_date_var, font=('times new roman', 10),
+        self.date_field = Entry(self.edit_detail_frame, textvariable=self.dob_date_field_var, font=('times new roman', 10),
                                 bg='lightgray')
 
         self.date_field.place(x=140, y=140, width=30, height=18)
 
         slash1 = Label(self.edit_detail_frame, text='/', font=('Goudy old style', 11), bg=None, fg='gray')
         slash1.place(x=185, y=137)
-        self.month_field = Entry(self.edit_detail_frame, textvariable=self.edit_month_var, font=('times new roman', 10),
+        self.month_field = Entry(self.edit_detail_frame, textvariable=self.dob_month_field_var, font=('times new roman', 10),
                                  bg='lightgray')
         self.month_field.place(x=205, y=140, width=30, height=18)
         slash2 = Label(self.edit_detail_frame, text='/', font=('Goudy old style', 11), bg=None, fg='gray')
         slash2.place(x=250, y=137)
-        self.year_field = Entry(self.edit_detail_frame, textvariable=self.edit_year_var, font=('times new roman', 10),
+        self.year_field = Entry(self.edit_detail_frame, textvariable=self.dob_year_field_var, font=('times new roman', 10),
                                 bg='lightgray')
         self.year_field.place(x=270, y=140, width=40, height=18)
 
@@ -601,7 +441,7 @@ class Admin_Page:
                                     fg='gray',
                                     bg=None)
         edit_student_gender.place(x=50, y=180)
-        self.edit_student_gender_combox = ttk.Combobox(self.edit_detail_frame, textvariable=self.edit_gender_var, font=('times new roman', 10),
+        self.edit_student_gender_combox = ttk.Combobox(self.edit_detail_frame, font=('times new roman', 10),
                                                        state='readonly')
         self.edit_student_gender_combox['values'] = ("M", "F")
         self.edit_student_gender_combox.place(x=140, y=183, width=170, height=18)
@@ -610,7 +450,7 @@ class Admin_Page:
                               fg='gray',
                               bg=None)
         edit_phone_no.place(x=50, y=220)
-        self.edit_phone_no_field = Entry(self.edit_detail_frame,  textvariable=self.edit_phone_no_var, font=('times new roman', 10), bg='lightgray')
+        self.edit_phone_no_field = Entry(self.edit_detail_frame, font=('times new roman', 10), bg='lightgray')
         self.edit_phone_no_field.place(x=140, y=223, width=170, height=18)
 
         edit_address = Label(self.edit_detail_frame, text='Address', font=('Goudy old style', 10, 'bold'),
@@ -621,8 +461,6 @@ class Admin_Page:
         edit_address_field = Text(self.edit_detail_frame, width=28, height=3, font=('times new roman', 10),
                                   bg='lightgray')
         edit_address_field.place(x=140, y=263)
-        edit_address_field.delete("1.0", END)
-        edit_address_field.insert(END, self.student_detail_row[7])
 
         apply_btn = Button(self.edit_detail_frame, text='Update', bg='#49a0ae', fg='white',
                             font=('times new roman', 10), activebackground='#49a0ae', activeforeground='white',
@@ -631,39 +469,9 @@ class Admin_Page:
 
         cancel_btn = Button(self.edit_detail_frame, text='Cancel', bg='#49a0ae', fg='white',
                                      font=('times new roman', 10), activebackground='#49a0ae', activeforeground='white',
-                                     cursor='hand2', command=self.edit_detail_cancel)
+                                     cursor='hand2', command=self.clear)
         cancel_btn.place(x=190, y=330, width=70, height=18)
 
-    def edit_detail_cancel(self):
-        self.edit_enroll_var.set("")
-        self.edit_name_var.set("")
-        self.edit_email_var.set("")
-        self.edit_date_var.set("")
-        self.edit_month_var.set("")
-        self.edit_year_var.set("")
-        self.edit_gender_var.set("")
-        self.edit_phone_no_var.set("")
-        self.update_page.destroy()
-
-    def search_detail(self):
-        try:
-
-            con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-            cursor = con.cursor()
-
-            #variable_a variable_b
-            # cursor.execute("select depart_id from department where department=%s", self.variable_b.get())
-
-            # cursor.execute("select * from student where enroll_no LIKE '________"+"select depart_id from department where department=%s", self.variable_b.get()+"%'")
-            rows = cursor.fetchall()
-            if len(rows) != 0:
-                self.student_data_table.delete(*self.student_data_table.get_children())
-                for row in rows:
-                    self.student_data_table.insert('', END, values=row)
-                con.commit()
-            con.close()
-        except Exception as ex:
-            messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
 #### ============================================= USER REGISTRATION  =============================================#####
 #### ==============================================================================================================#####
 

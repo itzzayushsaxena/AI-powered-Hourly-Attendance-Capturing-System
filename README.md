@@ -1,4 +1,8 @@
-# AI-powered-Hourly-Attendance-Capturing-System
+# AI-powered-Hourly-Attendance-Capturing-System(AI_PHACS)
+#### This is prototype of our project for [Design Engineering Subject](http://www.de.gtu.ac.in/Account/AboutUS).
+#### University : [GTU](https://www.gtu.ac.in/) 
+
+#### AI_PHACS is a software based attendance capturing system which will recognize the Faces And Accordingly will Store the data (Attendance) Present or Absent, then data can be used as per requirements.
 
 ## Table of contents
 1. [Requirements](#-requirements)
@@ -6,7 +10,7 @@
 3. [Found Solution For Loop-Hole In Technology](#-found-best-solution-for-loop-hole-in-technology)
 4. [Want To Contribute ??](#-want-to-contribute-)
 5. [Known Bugs](#-known-bugs)
-6. [Timeline](#-work-timeline)
+6. [Work Done Timeline](#-work-timeline)
 7. [License](#license)
 8. [FAQ](#faq)
 9. [Reference](#-reference)
@@ -24,7 +28,7 @@
  ```
 pip install -r requirements.txt
 ```
-#### 3. After changing directory to ../AI_PHACS in cmd run following command
+#### 3. Now to run the Software, After changing directory to ../AI_PHACS in cmd run following command
 ```
 main.py
 ```
@@ -70,6 +74,15 @@ self.object = PhotoImage(file="image.png", master=self.window_obj_name)
 #### 2. User Page  
 #### 3. How backend will Work??
 #### 4. Python File to Recognize Faces
+#### 5. Organizing files by:
+if file is in same directory
+```
+os.system('.py_file_name')
+```
+if file is in different directory
+```
+os.system('python .py_file_name')
+```
 
 #### ->Completed Work
 
@@ -84,6 +97,10 @@ self.object = PhotoImage(file="image.png", master=self.window_obj_name)
 #### 9. Admin Page -> Add_Student Page Design
 #### 10. Admin Page -> check_Detail Page Design
 #### 11. Admin Page -> check_Attendance Page Design
+#### 12. redesigned the UI
+#### 13. validation of add_student Section
+#### 14. Database Created
+
 
 ## **->License**
 
