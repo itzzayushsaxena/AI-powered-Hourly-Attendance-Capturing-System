@@ -431,9 +431,19 @@ class Admin_Page:
                             cursor='hand2', command=self.fetch_student_data)
         search_all_btn.place(x=1080, y=15, width=60, height=22)
 
+        # Count row
+        count_row_label = Label(self.detail_data_frame, text='No. Of Student  :  ', font=('Goudy old style', 12, 'bold'),
+                                fg='gray',
+                                bg='white')
+        count_row_label.place(x=30, y=5)
+        self.count_student_row = Label(self.detail_data_frame, text='', font=('Goudy old style', 12, 'bold'),
+                               fg='gray',
+                               bg='white')
+        self.count_student_row.place(x=170, y=5)
+
         # Table Frame
         self.student_table_frame = Frame(self.detail_data_frame, bd=4, relief=RIDGE, bg='white', )
-        self.student_table_frame.place(x=5, y=5, width=1180, height=610)
+        self.student_table_frame.place(x=5, y=25, width=1180, height=590)
 
         scroll_horizon = Scrollbar(self.student_table_frame, orient=HORIZONTAL)
         scroll_vertical = Scrollbar(self.student_table_frame, orient=VERTICAL)
@@ -490,6 +500,7 @@ class Admin_Page:
         cursor = con.cursor()
         cursor.execute("select * from student")
         rows = cursor.fetchall()
+        self.count_student_row.config(text=len(rows))
         if len(rows) != 0:
             self.student_data_table.delete(*self.student_data_table.get_children())
             for row in rows:
@@ -650,9 +661,10 @@ class Admin_Page:
 
     #Pending - - Validate after user edit data & before saving into Database
     def update_student_data(self):
-        if self.validate_edit_all_fields:
-            if self.validate_edit_number_field:
-                if self.is_valid_edit_email:
+        if self.validate_edit_all_fields():
+
+            if self.validate_edit_number_field():
+                if self.is_valid_edit_email():
 
                     try:
 
@@ -681,33 +693,31 @@ class Admin_Page:
                     except Exception as ex:
                         self.update_page.destroy()
                         messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
-
         else:
             print("validation of allFields Fails")
 
     def validate_edit_all_fields(self):
-
         if self.edit_name_field.get() == '':
-            messagebox.showerror("Error", "Please enter full name to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter full name to proceed", parent=self.update_page)
 
         elif self.edit_enroll_no_field.get() == '':
-            messagebox.showerror("Error", "Please enter Enrollnment No. to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter Enrollnment No. to proceed", parent=self.update_page)
 
         elif self.edit_email_field.get() == '':
-            messagebox.showerror("Error", "Please enter Email to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter Email to proceed", parent=self.update_page)
 
         elif self.edit_student_gender_combox.get() == '':
-            messagebox.showerror("Error", "Please Select Your Gender to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please Select Your Gender to proceed", parent=self.update_page)
 
-        elif (self.date_field.get() == '' or self.month_field.get() == ''
-              or self.year_field.get() == ''):
-            messagebox.showerror("Error", "Please enter Date Of Birth to proceed", parent=self.edit_detail_frame)
+        elif (self.edit_date_field.get() == '' or self.edit_month_field.get() == ''
+              or self.edit_year_field.get() == ''):
+            messagebox.showerror("Error", "Please enter Date Of Birth to proceed", parent=self.update_page)
 
         elif self.edit_phone_no_field.get() == '':
-            messagebox.showerror("Error", "Please enter Phone No. to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter Phone No. to proceed", parent=self.update_page)
 
         elif self.edit_address_field.get('1.0', END) == '':
-            messagebox.showerror("Error", "Please enter Address to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter Address to proceed", parent=self.update_page)
 
         else:
             return True
@@ -722,14 +732,14 @@ class Admin_Page:
                     return True
                 else:
                     messagebox.showerror("Error", "Please enter Date According To Format to proceed",
-                                         parent=self.edit_detail_frame)
+                                         parent=self.update_page)
 
             else:
                 messagebox.showerror("Error", "Please enter 10 digit Phone No. to proceed",
-                                     parent=self.edit_detail_frame)
+                                     parent=self.update_page)
 
         else:
-            messagebox.showerror("Error", "Please enter 12 digit Enrollnment No. to proceed", parent=self.edit_detail_frame)
+            messagebox.showerror("Error", "Please enter 12 digit Enrollnment No. to proceed", parent=self.update_page)
 
 
     def is_valid_edit_email(self):
@@ -737,7 +747,7 @@ class Admin_Page:
             if re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.edit_email_field.get()) is not None:
                 return True
             else:
-                messagebox.showerror("Error", "Please enter valid Email id to proceed", parent=self.edit_detail_frame)
+                messagebox.showerror("Error", "Please enter valid Email id to proceed", parent=self.update_page)
                 return False
 
 
@@ -755,16 +765,17 @@ class Admin_Page:
 
     def search_detail(self):
         try:
-            print(self.variable_b.get())
+            # print(self.variable_b.get())
             con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
             cursor = con.cursor()
             cursor.execute("select depart_id from department where department=%s", self.variable_b.get())
             id_row = cursor.fetchall()
-            print(cursor.execute("select depart_id from department where department=%s", self.variable_b.get()))
+            # print(cursor.execute("select depart_id from department where department=%s", self.variable_b.get()))
             cursor.execute("select * from student where depart_id=%s", id_row[0])
 
             rows = cursor.fetchall()
-            print(rows)
+            # print(rows)
+            self.count_student_row.config(text=len(rows))
             if len(rows) != 0:
                 self.student_data_table.delete(*self.student_data_table.get_children())
                 for row in rows:
@@ -858,6 +869,14 @@ class Admin_Page:
         clr_btn.place(x=850, y=85, width=100, height=30)
 
 
+        #Count row
+        count_row_label = Label(self.user_data_frame, text='No. Of User  :  ', font=('Goudy old style', 12, 'bold'), fg='gray',
+                         bg='white')
+        count_row_label.place(x=30, y=20)
+        self.count_row = Label(self.user_data_frame, text='', font=('Goudy old style', 12, 'bold'),
+                          fg='gray',
+                          bg='white')
+        self.count_row.place(x=140, y=20)
         #search_Frame
 
         self.search_frame = Frame(self.user_data_frame, bg='white', )
@@ -949,6 +968,7 @@ class Admin_Page:
         cursor = con.cursor()
         cursor.execute("select * from register")
         rows = cursor.fetchall()
+        self.count_row.config(text=len(rows))
         if len(rows) != 0:
             self.data_table.delete(*self.data_table.get_children())
             for row in rows:
@@ -1016,6 +1036,7 @@ class Admin_Page:
         cursor = con.cursor()
         cursor.execute("select * from register where usertype=%s", self.searchby_usertype_var.get())
         rows = cursor.fetchall()
+        self.count_row.config(text=len(rows))
         if len(rows) != 0:
             self.data_table.delete(*self.data_table.get_children())
             for row in rows:

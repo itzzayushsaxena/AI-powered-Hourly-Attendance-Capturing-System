@@ -29,11 +29,12 @@
  ```
 pip install -r requirements.txt
 ```
-#### 3. Now to run the Software, After changing directory to ../AI_PHACS in cmd run following command
+#### 3. Also add ai_phacs.sql file using [xamp](https://www.apachefriends.org/download.html)
+#### 4. Now to run the Software, After changing directory to ../AI_PHACS in cmd run following command
 ```
 main.py
 ```
-#### 4. If you don't want to authenticate & authorize yourself again & again to access the admin page or user page you can run following command
+#### 5. If you don't want to authenticate & authorize yourself again & again to access the admin page or user page you can run following command
 ### Note : cmd directory ../AI_PHACS
 ```
 admin_page.py
