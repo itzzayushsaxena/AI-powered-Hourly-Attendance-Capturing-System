@@ -11,10 +11,11 @@
 4. [Want To Contribute ??](#-want-to-contribute-)
 5. [Known Bugs](#-known-bugs)
 6. [Work Done Timeline](#-work-timeline)
-7. [License](#license)
-8. [FAQ](#faq)
-9. [Reference](#-reference)
-10. [Meet Team](#-team--role)
+7. [Future Development]()
+8. [License](#license)
+9. [FAQ](#faq)
+10. [Reference](#-reference)
+11. [Meet Team](#-team--role)
 
 
 ## **->Requirements**
@@ -100,7 +101,11 @@ os.system('python .py_file_name')
 #### 12. redesigned the UI
 #### 13. validation of add_student Section
 #### 14. Database Created
+#### 15. Add_Student page & Detail page Database Connected & functionality added
 
+## **->Future Development Plan**
+#### 1. Custom Modification Feature for Admin(can add department, Stream...)
+#### 2. Student Page where student can see their data
 
 ## **->License**
 
