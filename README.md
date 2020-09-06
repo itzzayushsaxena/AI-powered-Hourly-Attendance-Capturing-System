@@ -3,6 +3,7 @@
 #### University : [GTU](https://www.gtu.ac.in/) 
 
 #### AI_PHACS is a software based attendance capturing system which will recognize the Faces And Accordingly will Store the data (Attendance) Present or Absent, then data can be used as per requirements.
+#### An easy-to-use GUI is integrated so that users can use the system effortlessly without any specialized knowledge.
 
 ## Table of contents
 1. [Requirements](#-requirements)

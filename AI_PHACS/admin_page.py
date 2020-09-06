@@ -1,6 +1,7 @@
 import os
 from tkinter import *
 from tkinter import ttk
+
 from tkinter import messagebox
 from tkcalendar import *
 import pymysql
@@ -14,16 +15,18 @@ class Admin_Page:
         self.admin_page.state('zoomed')
         self.create_widgets()
 
-    # def connect_database(self):
-    #     self.con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-    #     self.cursor = self.con.cursor()
+    def connect_database(self):
+        self.con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
+        self.cursor = self.con.cursor()
 
     def create_widgets(self):
-        self.trainingPhoto = PhotoImage(file="images/Start Training2.png", master=self.admin_page)
-        self.studentPhoto = PhotoImage(file="images/Add Student2.png", master=self.admin_page)
-        self.userPhoto = PhotoImage(file="images/Add User2.png", master=self.admin_page)
-        self.detailPhoto = PhotoImage(file="images/Check Details2.png", master=self.admin_page)
-        self.attendancePhoto = PhotoImage(file="images/Check Attendance2.png", master=self.admin_page)
+
+        self.trainingPhoto = PhotoImage(file="images/Start Training Final.png", master=self.admin_page)
+        self.timetablePhoto = PhotoImage(file="images/Add Timetable Final.png", master=self.admin_page)
+        self.studentPhoto = PhotoImage(file="images/Add Student Final.png", master=self.admin_page)
+        self.userPhoto = PhotoImage(file="images/Add User Final.png", master=self.admin_page)
+        self.detailPhoto = PhotoImage(file="images/Check Details Final.png", master=self.admin_page)
+        self.attendancePhoto = PhotoImage(file="images/Check Attendance5.png", master=self.admin_page)
         self.logoutPhoto = PhotoImage(file="images/logout4.png", master=self.admin_page)
 
 
@@ -46,8 +49,11 @@ class Admin_Page:
 
         ###### FRAMES
 
+
+
         self.btn_frame = Frame(self.admin_page, bg=None)
         self.btn_frame.place(x=5, relheight=1, width=150)
+
 
         self.changeable_frame = Frame(self.admin_page, bg='white')
         self.changeable_frame.place(x=310,  y=55, height=680, width=1050)
@@ -61,34 +67,94 @@ class Admin_Page:
         # sep.pack(side="left", fill="x", padx=4, pady=4, expand=1)
         # sep = ttk.Style()
         # sep.configure('TSeparator', background='black')
+        scroll_vertical = Scrollbar(self.btn_frame, orient=VERTICAL)
+        scroll_vertical.pack(side=RIGHT, fill=Y, expand=FALSE)
 
-        self.checkAttendanceButton = Button(self.btn_frame, image=self.attendancePhoto,
+
+
+        canvas = Canvas(self.btn_frame, bd=0, highlightthickness=0,
+                           yscrollcommand=scroll_vertical.set, width=400, height=800)
+
+        canvas.pack(padx=8, pady=5, side=LEFT, fill=Y, expand=TRUE)
+        scroll_vertical.config(command=canvas.yview)
+
+        # reset the view
+        canvas.yview_moveto(0)
+
+        def _bound_to_mousewheel(event):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        def _unbound_to_mousewheel(event):
+            canvas.unbind_all("<MouseWheel>")
+
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        interior = Frame(canvas)
+
+        interior.bind('<Enter>', _bound_to_mousewheel)
+        interior.bind('<Leave>', _unbound_to_mousewheel)
+
+
+
+
+
+        interior_id = canvas.create_window(0, 0, window=interior,
+                                           anchor=NW)
+
+
+
+        # track changes to the canvas and frame width and sync them,
+        # also updating the scrollbar
+        def _configure_interior(event):
+            # update the scrollbars to match the size of the inner frame
+            size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
+            canvas.config(scrollregion="0 0 %s %s" % size)
+            if interior.winfo_reqwidth() != canvas.winfo_width():
+                # update the canvas's width to fit the inner frame
+                canvas.config(width=interior.winfo_reqwidth())
+
+        interior.bind('<Configure>', _configure_interior)
+
+        def _configure_canvas(event):
+            if interior.winfo_reqwidth() != canvas.winfo_width():
+                # update the inner frame's width to fill the canvas
+                canvas.itemconfigure(interior_id, width=canvas.winfo_width())
+
+        canvas.bind('<Configure>', _configure_canvas)
+
+        self.checkAttendanceButton = Button(interior, image=self.attendancePhoto,
                                             command=self.checkAttendanceClicked,
                                             border=0,
-                                            height=100, width=100, cursor='hand2',)
-        self.checkAttendanceButton.place(relx=0.5, rely=0.1, anchor=CENTER)
+                                            height=120, width=120, cursor='hand2',)
+        self.checkAttendanceButton.pack(padx=0, pady=5, side=TOP)
 
 
-        self.addUserButton = Button(self.btn_frame, image=self.userPhoto, command=self.addUserClicked, border=0,
-                                    height=100, width=100, cursor='hand2', )
-        self.addUserButton.place(relx=0.5, rely=0.3, anchor=CENTER)
+        self.addUserButton = Button(interior, image=self.userPhoto, command=self.addUserClicked, border=0,
+                                    height=120, width=120, cursor='hand2', )
+        self.addUserButton.pack(padx=0, pady=5, side=TOP)
 
-        self.addStudentButton = Button(self.btn_frame, image=self.studentPhoto, command=self.draw_add_student, border=0,
-                                  height=100,
-                                  width=100, cursor='hand2', state='disable', )
-        self.addStudentButton.place(relx=0.5, rely=0.5, anchor=CENTER)
+        self.addStudentButton = Button(interior, image=self.studentPhoto, command=self.draw_add_student, border=0,
+                                  height=120,
+                                  width=120, cursor='hand2', state='disable', )
+        self.addStudentButton.pack(padx=0, pady=5, side=TOP)
 
-        self.trainButton = Button(self.btn_frame, image=self.trainingPhoto, command=self.trainButtonClicked, border=0,
-                             height=100, width=100, cursor='hand2', )
-        self.trainButton.place(relx=0.5, rely=0.7, anchor=CENTER)
+        self.trainButton = Button(interior, image=self.trainingPhoto, command=self.trainButtonClicked, border=0,
+                             height=120, width=120, cursor='hand2', )
+        self.trainButton.pack(padx=0, pady=5, side=TOP)
 
-        self.checkDetailButton = Button(self.btn_frame, image=self.detailPhoto, command=self.checkDetailClicked,
+        self.checkDetailButton = Button(interior, image=self.detailPhoto, command=self.checkDetailClicked,
                                         border=0,
-                                        height=100, width=100, cursor='hand2', )
-        self.checkDetailButton.place(relx=0.5, rely=0.9, anchor=CENTER)
+                                        height=120, width=120, cursor='hand2', )
+        self.checkDetailButton.pack(padx=0, pady=5, side=TOP)
 
+        self.addTimeTableButton = Button(interior, image=self.timetablePhoto, command=self.addTimeTableClicked,
+                                        border=0,
+                                        height=120, width=120, cursor='hand2', )
+        self.addTimeTableButton.pack(padx=0, pady=5, side=TOP)
 
         self.trainButton['state'] = 'normal'
+        self.addTimeTableButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
@@ -102,9 +168,10 @@ class Admin_Page:
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
         self.changeable_frame = Frame(self.admin_page, bg='white')
-        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
+        self.changeable_frame.place(x=165, y=60, height=675, width=1190)
 
         self.addStudentButton['state'] = 'disable'
+        self.addTimeTableButton['state'] = 'normal'
         self.trainButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
@@ -128,7 +195,7 @@ class Admin_Page:
 
 
         self.add_student_frame = Frame(self.changeable_frame, bg='white', bd=4, relief=RIDGE)
-        self.add_student_frame.place(x=5, y=5, height=670, width=1190)
+        self.add_student_frame.place(x=5, y=5, height=665, width=1185)
         self.upload_Photo = PhotoImage(file="images/Profile_400px.png", master=self.add_student_frame)
 
         student_name = Label(self.add_student_frame, text='Student Name ', font=('Goudy old style', 15, 'bold'),
@@ -222,19 +289,23 @@ class Admin_Page:
         self.dob_year_field_var.set('')
 
     def add_student_submit_clicked(self):
+       print("Adding NewStudent.....")
+       print("Checking validations.....")
        if self.validate_all_fields():
             print(self.validate_number_field())
             if self.validate_number_field():
                 print(self.is_valid_email())
                 if self.is_valid_email():
-                    # self.connect_database()
-                    con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                    cursor = con.cursor()
-                    if cursor.execute("select enroll_no from student where enroll_no=%s", self.enroll_no_field.get()):
+                    print("Validation Check Done.....")
+                    print("Connecting Database.....")
+                    self.connect_database()
+                    print("Database Connected sucessfully")
+                    if self.cursor.execute("select enroll_no from student where enroll_no=%s", self.enroll_no_field.get()):
+                        print("Student with Same enrollnment number exist.....")
                         messagebox.showerror("Error", "Student With Same Enrollnment No. Exist, Try Different Enrollnment No.")
                     else:
 
-                        cursor.execute("insert into student(enroll_no,name,email,dob,gender,phone_no,address,depart_id)"
+                        self.cursor.execute("insert into student(enroll_no,name,email,dob,gender,phone_no,address,depart_id)"
                                             "values(%s,%s,%s,%s,%s,%s,%s,%s)",
                                        (
                                            self.enroll_no_field.get(),
@@ -247,9 +318,10 @@ class Admin_Page:
                                            (self.enroll_no_field.get()[7]+self.enroll_no_field.get()[8])
                                        ))
 
-                        con.commit()
+                        self.con.commit()
+                        print("newStudent Added Sucessfully.....")
                         self.add_student_clear()
-                        con.close()
+                        self.con.close()
                         messagebox.showinfo("sucess", "Data Added Sucessfully.")
        else:
             print("validation of allFields Fails")
@@ -338,6 +410,7 @@ class Admin_Page:
         self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.trainButton['state'] = 'disable'
+        self.addTimeTableButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
@@ -358,6 +431,7 @@ class Admin_Page:
         self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.checkDetailButton['state'] = 'disable'
+        self.addTimeTableButton['state'] = 'normal'
         self.trainButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
@@ -441,6 +515,17 @@ class Admin_Page:
                                bg='white')
         self.count_student_row.place(x=170, y=5)
 
+        # Show Department
+        department_label = Label(self.detail_data_frame, text='Department  :  ',
+                                font=('Goudy old style', 12, 'bold'),
+                                fg='gray',
+                                bg='white')
+        department_label.place(x=220, y=5)
+        self.show_department = Label(self.detail_data_frame, text='All', font=('Goudy old style', 12, 'bold'),
+                                       fg='gray',
+                                       bg='white')
+        self.show_department.place(x=330, y=5)
+
         # Table Frame
         self.student_table_frame = Frame(self.detail_data_frame, bd=4, relief=RIDGE, bg='white', )
         self.student_table_frame.place(x=5, y=25, width=1180, height=590)
@@ -448,12 +533,14 @@ class Admin_Page:
         scroll_horizon = Scrollbar(self.student_table_frame, orient=HORIZONTAL)
         scroll_vertical = Scrollbar(self.student_table_frame, orient=VERTICAL)
         self.student_data_table = ttk.Treeview(self.student_table_frame,
-                                               columns=("enroll_no", "name", "perc", "phno", "email","gender", "dob", "address"),
+                                               columns=("srno", "enroll_no", "name", "perc", "phno", "email","gender", "dob", "address"),
                                                xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
         scroll_horizon.pack(side=BOTTOM, fill=X)
         scroll_vertical.pack(side=RIGHT, fill=Y)
         scroll_horizon.config(command=self.student_data_table.xview)
         scroll_vertical.config(command=self.student_data_table.yview)
+        self.student_data_table.heading("srno", text="SrNo.")
+        self.student_data_table.column("srno", width=50)
         self.student_data_table.heading("enroll_no", text="EnrollNo.")
         self.student_data_table.column("enroll_no", width=130)
         self.student_data_table.heading("name", text="Student Name")
@@ -496,18 +583,23 @@ class Admin_Page:
 
 
     def fetch_student_data(self):
-        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        cursor = con.cursor()
-        cursor.execute("select * from student")
-        rows = cursor.fetchall()
-        self.count_student_row.config(text=len(rows))
-        if len(rows) != 0:
-            self.student_data_table.delete(*self.student_data_table.get_children())
-            for row in rows:
-                # print(row)
-                self.student_data_table.insert('', END, values=(row[0], row[1], 0, row[5], row[2], row[4], row[3], row[6]))
-                con.commit()
-        con.close()
+        try:
+            self.connect_database()
+            self.show_department.config(text='All')
+            self.cursor.execute("select * from student")
+            rows = self.cursor.fetchall()
+            self.count_student_row.config(text=len(rows))
+            if len(rows) != 0:
+                self.student_data_table.delete(*self.student_data_table.get_children())
+                count = 1
+                for row in rows:
+                    # print(row)
+                    self.student_data_table.insert('', END, values=(count, row[0], row[1], 0, row[5], row[2], row[4], row[3], row[6]))
+                    self.con.commit()
+                    count += 1
+            self.con.close()
+        except Exception as ex:
+            messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
 
     def detail_delete_data(self):
         if hasattr(self, 'student_detail_row'):
@@ -515,11 +607,11 @@ class Admin_Page:
             # print(m)
             if m:
                 try:
-                    con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                    cursor = con.cursor()
-                    cursor.execute("delete from student where enroll_no=%s", self.student_detail_row[0])
-                    con.commit()
-                    con.close()
+                    self.connect_database()
+                    self.cursor.execute("delete from student where enroll_no=%s", self.student_detail_row[1])
+                    self.con.commit()
+                    self.con.close()
+                    messagebox.showinfo("Success", "Student is Delete succesfully.")
                     self.fetch_student_data()
 
                 except Exception as ex:
@@ -543,25 +635,25 @@ class Admin_Page:
             ## Variable
 
             self.edit_enroll_var = StringVar()
-            self.edit_enroll_var.set(self.student_detail_row[0])
+            self.edit_enroll_var.set(self.student_detail_row[1])
             self.edit_name_var = StringVar()
-            self.edit_name_var.set(self.student_detail_row[1])
+            self.edit_name_var.set(self.student_detail_row[2])
             self.edit_email_var = StringVar()
-            self.edit_email_var.set(self.student_detail_row[4])
+            self.edit_email_var.set(self.student_detail_row[5])
             # print(datetime.datetime.strptime(self.student_detail_row[6], "%Y-%m-%d"))
-            edit_dob = datetime.datetime.strptime(self.student_detail_row[6], "%Y-%m-%d")
+            edit_dob = datetime.datetime.strptime(self.student_detail_row[7], "%Y-%m-%d")
             # print(format(edit_dob.month,'02'))
             # print(format(edit_dob.day, '02'))
             self.edit_date_var = StringVar()
-            self.edit_date_var.set(format(edit_dob.day,'02'))
+            self.edit_date_var.set(format(edit_dob.day, '02'))
             self.edit_month_var = StringVar()
-            self.edit_month_var.set(format(edit_dob.month,'02'))
+            self.edit_month_var.set(format(edit_dob.month, '02'))
             self.edit_year_var = StringVar()
             self.edit_year_var.set(edit_dob.year)
             self.edit_gender_var = StringVar()
-            self.edit_gender_var.set(self.student_detail_row[5])
+            self.edit_gender_var.set(self.student_detail_row[6])
             self.edit_phone_no_var = StringVar()
-            self.edit_phone_no_var.set(self.student_detail_row[3])
+            self.edit_phone_no_var.set(self.student_detail_row[4])
         else:
             messagebox.showerror("Error", "Select student From Table To Update")
             return
@@ -635,7 +727,7 @@ class Admin_Page:
                                   bg='lightgray')
         self.edit_address_field.place(x=140, y=263)
         self.edit_address_field.delete("1.0", END)
-        self.edit_address_field.insert(END, self.student_detail_row[7])
+        self.edit_address_field.insert(END, self.student_detail_row[8])
 
         apply_btn = Button(self.edit_detail_frame, text='Update', bg='#49a0ae', fg='white',
                             font=('times new roman', 10), activebackground='#49a0ae', activeforeground='white',
@@ -667,12 +759,9 @@ class Admin_Page:
                 if self.is_valid_edit_email():
 
                     try:
+                        self.connect_database()
 
-
-                        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                        cursor = con.cursor()
-                        print(self.student_detail_row[0])
-                        cursor.execute("update student set enroll_no=%s, name=%s, email=%s, dob=%s, gender=%s, phone_no=%s, address=%s, depart_id=%s where enroll_no=%s",
+                        self.cursor.execute("update student set enroll_no=%s, name=%s, email=%s, dob=%s, gender=%s, phone_no=%s, address=%s, depart_id=%s where enroll_no=%s",
                                        (
 
                                            self.edit_enroll_no_field.get(),
@@ -683,11 +772,11 @@ class Admin_Page:
                                            self.edit_phone_no_field.get(),
                                            self.edit_address_field.get('1.0', END),
                                            self.edit_enroll_no_field.get()[7] + self.edit_enroll_no_field.get()[8],
-                                           self.student_detail_row[0]
+                                           self.student_detail_row[1]
                                        ))
-                        con.commit()
+                        self.con.commit()
                         self.update_page.destroy()
-                        con.close()
+                        self.con.close()
                         messagebox.showinfo("Success", "Student Data updated Sucessfully")
                         self.fetch_student_data()
                     except Exception as ex:
@@ -766,22 +855,29 @@ class Admin_Page:
     def search_detail(self):
         try:
             # print(self.variable_b.get())
-            con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-            cursor = con.cursor()
-            cursor.execute("select depart_id from department where department=%s", self.variable_b.get())
-            id_row = cursor.fetchall()
-            # print(cursor.execute("select depart_id from department where department=%s", self.variable_b.get()))
-            cursor.execute("select * from student where depart_id=%s", id_row[0])
+            self.connect_database()
+            self.cursor.execute("select depart_id from department where department=%s", self.variable_b.get())
+            id_row = self.cursor.fetchall()
 
-            rows = cursor.fetchall()
-            # print(rows)
-            self.count_student_row.config(text=len(rows))
-            if len(rows) != 0:
-                self.student_data_table.delete(*self.student_data_table.get_children())
-                for row in rows:
-                    self.student_data_table.insert('', END, values=(row[0], row[1], 0, row[5], row[2], row[4], row[3], row[6]))
-                con.commit()
-            con.close()
+
+            # print(cursor.execute("select depart_id from department where department=%s", self.variable_b.get()))
+            self.cursor.execute("select * from student where depart_id=%s", id_row[0])
+
+            rows = self.cursor.fetchall()
+            print(rows)
+            if rows == ():
+                messagebox.showerror("Error", "No Student Found for Department ->" + self.variable_b.get())
+            else:
+                self.count_student_row.config(text=len(rows))
+                self.show_department.config(text=self.variable_b.get())
+                if len(rows) != 0:
+                    self.student_data_table.delete(*self.student_data_table.get_children())
+                    count = 1
+                    for row in rows:
+                        self.student_data_table.insert('', END, values=(count, row[0], row[1], 0, row[5], row[2], row[4], row[3], row[6]))
+                        count += 1
+                    self.con.commit()
+                self.con.close()
         except Exception as ex:
             messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
 #### ============================================= USER REGISTRATION  =============================================#####
@@ -801,6 +897,7 @@ class Admin_Page:
         self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.addUserButton['state'] = 'disable'
+        self.addTimeTableButton['state'] = 'normal'
         self.trainButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
@@ -910,16 +1007,18 @@ class Admin_Page:
 
         scroll_horizon = Scrollbar(table_frame, orient=HORIZONTAL)
         scroll_vertical = Scrollbar(table_frame, orient=VERTICAL)
-        self.data_table = ttk.Treeview(table_frame, columns=("no", "id", "doj", "type"),
+        self.data_table = ttk.Treeview(table_frame, columns=("srno", "id", "name", "doj", "type"),
                                        xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
         scroll_horizon.pack(side=BOTTOM, fill=X)
         scroll_vertical.pack(side=RIGHT, fill=Y)
         scroll_horizon.config(command=self.data_table.xview)
         scroll_vertical.config(command=self.data_table.yview)
-        self.data_table.heading("no", text="No.")
-        self.data_table.column("no", width=90)
-        self.data_table.heading("id", text="User Name")
-        self.data_table.column("id", width=250)
+        self.data_table.heading("srno", text="SrNo.")
+        self.data_table.column("srno", width=50)
+        self.data_table.heading("id", text="ID")
+        self.data_table.column("id", width=90)
+        self.data_table.heading("name", text="User Name")
+        self.data_table.column("name", width=250)
         self.data_table.heading("doj", text="Date Of Joining")
         self.data_table.column("doj", width=150)
         self.data_table.heading("type", text="User Type")
@@ -939,42 +1038,48 @@ class Admin_Page:
         else:
             # try:
             # print(self.id_field.get(), self.password_field.get(), self.user_type_combox.get(), datetime.datetime.now().strftime('%Y-%m-%d'))
-            con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-            cursor = con.cursor()
-            if cursor.execute("select username from register where username=%s", self.id_field.get()):
-                messagebox.showerror("Error", "User Already Exist, Try Different Username")
-            else:
-                cursor.execute("insert into register(username,date,usertype,password) values(%s,%s,%s,%s)",
-                               (
-                                   self.id_field.get(),
-                                   datetime.datetime.now().strftime('%Y-%m-%d'),
-                                   self.user_type_combox.get(),
-                                   self.password_field.get()
-                               ))
+            try:
+                self.connect_database()
+                if self.cursor.execute("select username from register where username=%s", self.id_field.get()):
+                    messagebox.showerror("Error", "User Already Exist, Try Different Username")
+                    self.clear()
+                else:
+                    self.cursor.execute("insert into register(username,date,usertype,password) values(%s,%s,%s,%s)",
+                                   (
+                                       self.id_field.get(),
+                                       datetime.datetime.now().strftime('%Y-%m-%d'),
+                                       self.user_type_combox.get(),
+                                       self.password_field.get()
+                                   ))
 
-                con.commit()
-                self.fetch_data()
-                self.clear()
-                con.close()
+                    self.con.commit()
+                    self.fetch_data()
+                    self.clear()
+                    self.con.close()
+                    messagebox.showinfo("sucess", "User Added Sucessfully.")
                 ### base64.b64encode (pass)
                 ### base64.b64decode (pass)
-            # except Exception as ex:
-            #
-            #     messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n User Already Exist, Try Different Username")
-            #     self.clear()
+            except Exception as ex:
+                messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
+
 
     def fetch_data(self):
-        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        cursor = con.cursor()
-        cursor.execute("select * from register")
-        rows = cursor.fetchall()
-        self.count_row.config(text=len(rows))
-        if len(rows) != 0:
-            self.data_table.delete(*self.data_table.get_children())
-            for row in rows:
-                self.data_table.insert('', END, values=row)
-                con.commit()
-        con.close()
+        try:
+            self.connect_database()
+            self.cursor.execute("select * from register")
+            rows = self.cursor.fetchall()
+
+            self.count_row.config(text=len(rows))
+            if len(rows) != 0:
+                self.data_table.delete(*self.data_table.get_children())
+                count = 1
+                for row in rows:
+                    self.data_table.insert('', END, values=(count, row[0], row[1], row[2], row[3]))
+                    self.con.commit()
+                    count += 1
+            self.con.close()
+        except Exception as ex:
+            messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
 
     def clear(self):
         self.user_id_var.set('')
@@ -987,30 +1092,36 @@ class Admin_Page:
         contents = self.data_table.item(selection_row)
         self.row = contents['values']
         # print(row)
-        self.user_id_var.set(self.row[1])
-        self.user_type_combox.set(self.row[3])
-        self.user_pass_var.set(self.row[4])
+        self.user_id_var.set(self.row[2])
+        self.user_type_combox.set(self.row[4])
+        self.connect_database()
+        self.cursor.execute("select password from register where reg_id=%s", self.row[1])
+        password = self.cursor.fetchall()
+        self.user_pass_var.set(password)
+        self.con.commit()
+        self.con.close()
 
     def update_data(self):
-
+        print("Updating Selected Student.....")
         if self.id_field.get() == '' or self.user_type_combox.get() == '' or self.password_field.get() == '':
             messagebox.showerror("Error", "Select User From Table To Update", parent=self.manage_user_frame)
         else:
             try:
-                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                cursor = con.cursor()
-                cursor.execute("update register set username=%s, date=%s, usertype=%s, password=%s where reg_id=%s",
+                self.connect_database()
+                print("database connection done.....")
+                self.cursor.execute("update register set username=%s, date=%s, usertype=%s, password=%s where reg_id=%s",
                                (
                                    self.id_field.get(),
                                    datetime.datetime.now().strftime('%Y-%m-%d'),
                                    self.user_type_combox.get(),
                                    self.password_field.get(),
-                                   self.row[0]
+                                   self.row[1]
                                ))
-                con.commit()
+                self.con.commit()
+                self.con.close()
                 self.fetch_data()
                 self.clear()
-                con.close()
+                messagebox.showinfo("sucess", "User data Updated Sucessfully.")
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n Select User From Table To Update")
                 self.clear()
@@ -1020,29 +1131,30 @@ class Admin_Page:
             messagebox.showerror("Error", "Select User From Table To Delete", parent=self.manage_user_frame)
         else:
             try:
-                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                cursor = con.cursor()
-                cursor.execute("delete from register where reg_id=%s", self.row[0])
-                con.commit()
-                con.close()
+                self.connect_database()
+                self.cursor.execute("delete from register where reg_id=%s", self.row[1])
+                self.con.commit()
+                self.con.close()
                 self.fetch_data()
                 self.clear()
+                messagebox.showinfo("sucess", "User Deleted Sucessfully.")
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}\n Select User From Table To Delete")
                 self.clear()
 
     def search(self):
-        con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        cursor = con.cursor()
-        cursor.execute("select * from register where usertype=%s", self.searchby_usertype_var.get())
-        rows = cursor.fetchall()
+        self.connect_database()
+        self.cursor.execute("select * from register where usertype=%s", self.searchby_usertype_var.get())
+        rows = self.cursor.fetchall()
         self.count_row.config(text=len(rows))
         if len(rows) != 0:
             self.data_table.delete(*self.data_table.get_children())
+            count = 1
             for row in rows:
-                self.data_table.insert('', END, values=row)
-            con.commit()
-        con.close()
+                self.data_table.insert('', END, values=(count, row[0], row[1], row[2], row[3]))
+                count += 1
+            self.con.commit()
+        self.con.close()
 
 #### ============================================= CHECK ATTENDANCE  =============================================######
 #### ==============================================================================================================#####
@@ -1059,17 +1171,40 @@ class Admin_Page:
         self.changeable_frame.place(x=310, y=55, height=680, width=1050)
 
         self.checkAttendanceButton['state'] = 'disable'
+        self.addTimeTableButton['state'] = 'normal'
         self.trainButton['state'] = 'normal'
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.addStudentButton['state'] = 'normal'
         print('sucess')
 
+#### ============================================= Add Timetable      =============================================#####
+#### ==============================================================================================================#####
+    def addTimeTableClicked(self):
+        # os.system('train.py')
+        self.changeable_frame.destroy()
+        self.banner_title.destroy()
+
+        self.banner_title = Label(self.banner_frame, text='Admin | TimeTable Page',
+                                  font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
+        self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
+
+        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
+
+        self.addTimeTableButton['state'] = 'disable'
+        self.trainButton['state'] = 'normal'
+        self.checkAttendanceButton['state'] = 'normal'
+        self.checkDetailButton['state'] = 'normal'
+        self.addUserButton['state'] = 'normal'
+        self.addStudentButton['state'] = 'normal'
+
 #### ============================================= LOG OUT  =============================================######
 #### ==============================================================================================================#####
     def logoutClicked(self):
         self.admin_page.destroy()
         import main
+        
 root = Tk()
 obj = Admin_Page(root)
 root.mainloop()
