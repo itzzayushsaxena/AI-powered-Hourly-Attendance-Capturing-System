@@ -46,7 +46,9 @@ class Admin_Page:
         self.cursor.execute("select username from register where reg_id=%s", session_id)
         row_name = self.cursor.fetchall()
         self.user_logged_in_var = StringVar()
-        self.user_logged_in_var.set(row_name[0][0])
+        if (len(row_name) != 0):
+            self.user_logged_in_var.set(row_name[0][0])
+
         logout_label = Label(self.banner_frame, text="Welcome,  ", font=('times new roman', 10, 'bold'),
                              bg='#49a0ae',
                              fg='white')
@@ -1069,13 +1071,35 @@ class Admin_Page:
 
                     self.con.commit()
                     self.fetch_data()
+
+
+                    self.store_registration_id()
                     self.clear()
-                    self.con.close()
                     messagebox.showinfo("sucess", "User Added Sucessfully.")
                 ### base64.b64encode (pass)
                 ### base64.b64decode (pass)
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
+
+    def store_registration_id(self):
+        self.connect_database()
+        self.cursor.execute("select reg_id from register where username=%s and usertype='Teacher'", self.id_field.get())
+        registration_id = self.cursor.fetchall()
+        # print(len(registration_id))
+        if (len(registration_id) != 0):
+            self.cursor.execute(
+                "insert into teacher(reg_id, name, email, dob, gender, address, phone_no) values(%s, %s, %s, %s, %s, %s, %s)",
+                (
+                    str(registration_id[0][0]),
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
+                ))
+        self.con.commit()
+        self.con.close()
 
     def fetch_data(self):
         try:
@@ -1084,13 +1108,12 @@ class Admin_Page:
             rows = self.cursor.fetchall()
 
             self.count_row.config(text=len(rows))
-            if len(rows) != 0:
-                self.data_table.delete(*self.data_table.get_children())
-                count = 1
-                for row in rows:
-                    self.data_table.insert('', END, values=(count, row[0], row[1], row[2], row[3]))
-                    self.con.commit()
-                    count += 1
+            self.data_table.delete(*self.data_table.get_children())
+            count = 1
+            for row in rows:
+                self.data_table.insert('', END, values=(count, row[0], row[1], row[2], row[3]))
+                self.con.commit()
+                count += 1
             self.con.close()
         except Exception as ex:
             messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
