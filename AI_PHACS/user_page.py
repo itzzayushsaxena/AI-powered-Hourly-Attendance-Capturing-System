@@ -158,6 +158,8 @@ class User_Page:
         self.edit_gender_var = StringVar()
         self.edit_address_var = StringVar()
         self.edit_phone_no_var = StringVar()
+        self.subject_name_var = StringVar()
+        self.subject_name = StringVar()
 
         profile_edit_btn = Button(self.btn_frame, text='Edit Profile', bg='#49a0ae', fg='white',
                                      font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
@@ -184,7 +186,7 @@ class User_Page:
         fullname.place(x=120, y=40)
         Label(self.profile_frame, text='Subjects ', font=('times new roman', 12), bg='white',
                          fg='black').place(x=20, y=80)
-        subjects = Label(self.profile_frame, text='Null', font=('times new roman', 12), bg='white',
+        subjects = Label(self.profile_frame, textvariable=self.subject_name, font=('times new roman', 12), bg='white',
                          fg='black')
         subjects.place(x=120, y=80)
         Label(self.profile_frame, text='Address:', font=('times new roman', 12), bg='white',
@@ -234,7 +236,24 @@ class User_Page:
         self.cursor.execute("select teacher_id from teacher where reg_id=%s", self.register_id[0][0])
         self.teacher_id = self.cursor.fetchall()
         self.teacher_id = self.teacher_id[0][0]
+        self.cursor.execute("select subject_id from assigned_subjects where teacher_id=%s", self.teacher_id)
+        subjectid_tuple = self.cursor.fetchall()
 
+        subjectid_list = []
+        subject_name = []
+        subject_list = []
+        for i in range(0, len(subjectid_tuple)):
+            subjectid_list.append(subjectid_tuple[i][0])
+        print(subjectid_list)
+
+
+        for subject in subjectid_list:
+            self.cursor.execute("select subject from subject where subject_id=%s", subject)
+            subject_name += self.cursor.fetchall()
+        for count in range(0, len(subject_name)):
+            subject_list.append(subject_name[count][0])
+
+        print(subject_list)
         self.con.commit()
         self.con.close()
 
@@ -249,6 +268,10 @@ class User_Page:
         self.edit_gender_var.set(teacher_info[0][5])
         self.edit_address_var.set(teacher_info[0][6])
         self.edit_phone_no_var.set(teacher_info[0][7])
+        self.subject_name.set('')
+        for subject in subject_list:
+            self.subject_name.set(self.subject_name.get() + str(subject) + ' , ')
+
 
 
     def edit_profile(self):
@@ -386,6 +409,7 @@ class User_Page:
                     self.subject_name_var = StringVar()
                     self.total = StringVar()
                     self.subject_name_var.set('')
+                    # database connetion pending
                     self.total.set('30')
                     Label(self.edit_detail_frame, text='(Please Select Your Subjects. you can scroll through list)',
                           font=('Goudy old style', 12, 'bold'),
@@ -486,7 +510,6 @@ class User_Page:
                 return False
 
     def apply(self):
-        print(self.lb.curselection())
         for item in self.lb.curselection():
             self.subject_name_var.set(self.subject_name_var.get() + str(self.lb.get(item)) + ',')
 
@@ -497,50 +520,41 @@ class User_Page:
         subject_id = ()
         subjectid_list = []
         self.connect_database()
+
+
         count = 0
         for subject in subject_name_list:
             self.cursor.execute("select subject_id from subject where subject=%s", subject)
             subject_id += self.cursor.fetchall()
             subjectid_list.append(subject_id[count][0])
             count += 1
-
-        print(subjectid_list)
-
-        self.cursor.execute("select subject_id from assigned_subjects where teacher_id=%s", self.teacher_id)
-        db_subject_id = self.cursor.fetchall()
-
-        index = 0
-        db_id_list = []
-        for i in range(0, len(db_subject_id)):
-            db_id_list.append(db_subject_id[index][0])
-            index += 1
-
-        for id in db_id_list:
-            if id in subjectid_list:
-                print("yes")
-            else:
-                print('no')
-
-        # for id in subjectid_list:
-        #     self.cursor.execute("insert into assigned_subjects(teacher_id,subject_id)"
-        #                         "values(%s,%s)",
-        #                         (
-        #                             self.teacher_id,
-        #                             id
-        #                         ))
-
         self.con.commit()
         self.con.close()
+        print(subjectid_list)
+        if not subjectid_list:
+            print("Empty")
+        else:
+            self.connect_database()
+            self.cursor.execute("delete from assigned_subjects where teacher_id=%s", self.teacher_id)
+            self.con.commit()
+            self.con.close()
+            self.connect_database()
+            for id in subjectid_list:
+                self.cursor.execute("insert into assigned_subjects(teacher_id,subject_id)"
+                                    "values(%s,%s)",
+                                    (
+                                        self.teacher_id,
+                                        id
+                                    ))
+                self.con.commit()
+            self.con.close()
+            self.edit_profile_frame.destroy()
+            self.fetch_teacher_data()
+            messagebox.showinfo("Sucess", "Profile Updated Sucessfully.",
+                                 parent=self.profile_frame)
 
-    # def edit_detail_cancel(self):
-    #     self.edit_name_var.set("")
-    #     self.edit_email_var.set("")
-    #     self.edit_date_var.set("")
-    #     self.edit_month_var.set("")
-    #     self.edit_year_var.set("")
-    #     self.edit_gender_var.set("")
-    #     self.edit_phone_no_var.set("")
-    #     self.update_page.destroy()
+
+
 
     def checkAttendanceButtonClicked(self):
         self.changeable_frame.destroy()

@@ -1093,7 +1093,7 @@ class Admin_Page:
                     str(registration_id[0][0]),
                     '',
                     '',
-                    '',
+                    '2000-01-01',
                     '',
                     '',
                     ''
