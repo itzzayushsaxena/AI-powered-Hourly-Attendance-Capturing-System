@@ -12,7 +12,7 @@
 4. [Want To Contribute ??](#-want-to-contribute-)
 5. [Known Bugs](#-known-bugs)
 6. [Work Done Timeline](#-work-timeline)
-7. [Future Development]()
+7. [Future Development](#-future-development-plan)
 8. [License](#license)
 9. [FAQ](#faq)
 10. [Reference](#-reference)

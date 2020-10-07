@@ -1,10 +1,10 @@
 from tkinter import *
-import pymysql
 import re
 from tkinter import ttk
 from tkinter import messagebox
-from cryptography.fernet import Fernet
-
+from sessionGenerator import readId
+from database import connect_database
+from dataTypeConversion import tupleToList
 
 class User_Page:
     def __init__(self, root):
@@ -14,11 +14,11 @@ class User_Page:
         self.create_widgets()
 
     def connect_database(self):
-        self.con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        self.cursor = self.con.cursor()
+        result = connect_database()
+        self.con = result[0]
+        self.cursor = result[1]
 
     def create_widgets(self):
-
         self.profilePhoto = PhotoImage(file="images/Profile 3.png", master=self.user_page)
         self.checkAttendancePhoto = PhotoImage(file="images/Check Attendance Final.png", master=self.user_page)
         self.checkStudentDetailPhoto = PhotoImage(file="images/Check Details Final.png", master=self.user_page)
@@ -31,19 +31,10 @@ class User_Page:
                                   fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
-        with open('session_id.txt', 'r') as f:
-            lines = f.readlines()
-            key = lines[0].strip()
-            encrpted_text = lines[1].strip()
-        fer = Fernet(key.encode())
-        session_id = (fer.decrypt(encrpted_text.encode())).decode("utf-8")
-        self.connect_database()
-        self.cursor.execute("select username from register where reg_id=%s", session_id)
-        row_name = self.cursor.fetchall()
+        row_name = readId()
         self.user_logged_in_var = StringVar()
         if (len(row_name) != 0):
             self.user_logged_in_var.set(row_name[0][0])
-
 
         logout_label = Label(self.banner_frame, text="Welcome,  ", font=('times new roman', 10, 'bold'),
                              bg='#49a0ae',
@@ -95,8 +86,7 @@ class User_Page:
         interior.bind('<Enter>', _bound_to_mousewheel)
         interior.bind('<Leave>', _unbound_to_mousewheel)
 
-        interior_id = canvas.create_window(0, 0, window=interior,
-                                           anchor=NW)
+        interior_id = canvas.create_window(0, 0, window=interior, anchor=NW)
 
         def _configure_interior(event):
             size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
@@ -225,10 +215,7 @@ class User_Page:
         self.fetch_teacher_data()
 
     def fetch_teacher_data(self):
-
-
         self.connect_database()
-
         self.cursor.execute("select reg_id from register where username=%s", self.user_logged_in_var.get())
         self.register_id = self.cursor.fetchall()
         self.cursor.execute("select * from teacher where reg_id=%s", self.register_id[0][0])
@@ -238,22 +225,15 @@ class User_Page:
         self.teacher_id = self.teacher_id[0][0]
         self.cursor.execute("select subject_id from assigned_subjects where teacher_id=%s", self.teacher_id)
         subjectid_tuple = self.cursor.fetchall()
+        subjectid_list = tupleToList(subjectid_tuple)
 
-        subjectid_list = []
         subject_name = []
         subject_list = []
-        for i in range(0, len(subjectid_tuple)):
-            subjectid_list.append(subjectid_tuple[i][0])
-        print(subjectid_list)
-
-
         for subject in subjectid_list:
             self.cursor.execute("select subject from subject where subject_id=%s", subject)
             subject_name += self.cursor.fetchall()
         for count in range(0, len(subject_name)):
             subject_list.append(subject_name[count][0])
-
-        print(subject_list)
         self.con.commit()
         self.con.close()
 
@@ -272,21 +252,15 @@ class User_Page:
         for subject in subject_list:
             self.subject_name.set(self.subject_name.get() + str(subject) + ' , ')
 
-
-
     def edit_profile(self):
         self.edit_profile_frame = Toplevel(self.profile_frame)
         self.edit_profile_frame.title("AI-PHACS | Edit Profile")
         self.edit_profile_frame.geometry('385x420+540+250')
-
         self.edit_detail_frame = Frame(self.edit_profile_frame, bg=None, )
         self.edit_detail_frame.place(x=5, y=25, width=375, height=375)
 
-
-
         Label(self.edit_detail_frame, text='Complete Your Profile', font=('Goudy old style', 15, 'bold'),
                                fg='black', bg=None).place(x=90, y=0)
-
 
         fullname = Label(self.edit_detail_frame, text='FullName ', font=('Goudy old style', 10, 'bold'),
                                   fg='gray',
@@ -366,22 +340,10 @@ class User_Page:
     def next_page(self):
 
         if self.validate_edit_all_fields():
-
             if self.validate_edit_number_field():
-
                 if self.is_valid_edit_email():
-
                     try:
-                        # print(self.fullname_field.get(),
-                        #         self.edit_email_field.get(),
-                        #         str(self.edit_year_field.get()) + "/" + str(self.edit_month_field.get()) + "/" + str(
-                        #             self.edit_date_field.get()),
-                        #         self.edit_student_gender_combox.get(),
-                        #         self.edit_phone_no_field.get(),
-                        #         self.edit_address_field.get('1.0', END),
-                        #         self.user_logged_in_var.get())
                         self.connect_database()
-
                         self.cursor.execute(
                             "update teacher set name=%s, email=%s, dob=%s, gender=%s, phone_no=%s, address=%s where reg_id=%s",
                             (
@@ -403,14 +365,16 @@ class User_Page:
                         messagebox.showerror("Error", f"Action Failed Due To : {str(ex)}")
                         self.edit_profile_frame.destroy()
 
-
                     self.edit_detail_frame = Frame(self.edit_profile_frame, bg=None, )
                     self.edit_detail_frame.place(x=5, y=5, width=375, height=410)
                     self.subject_name_var = StringVar()
                     self.total = StringVar()
                     self.subject_name_var.set('')
                     # database connetion pending
-                    self.total.set('30')
+                    self.connect_database()
+                    self.cursor.execute("select count(*) from subject")
+                    self.total.set(self.cursor.fetchall()[0][0])
+                    self.con.close()
                     Label(self.edit_detail_frame, text='(Please Select Your Subjects. you can scroll through list)',
                           font=('Goudy old style', 12, 'bold'),
                           fg='black', bg=None).place(x=5, y=0)
@@ -478,8 +442,8 @@ class User_Page:
         elif self.edit_phone_no_field.get() == '':
             messagebox.showerror("Error", "Please enter Phone No. to proceed", parent=self.edit_profile_frame)
 
-        # elif self.edit_address_field.get('1.0', END) == '':
-        #     messagebox.showerror("Error", "Please enter Address to proceed", parent=self.edit_profile_frame)
+        elif self.edit_address_field.get('1.0', END) == '':
+            messagebox.showerror("Error", "Please enter Address to proceed", parent=self.edit_profile_frame)
 
         else:
             return True
@@ -510,18 +474,16 @@ class User_Page:
                 return False
 
     def apply(self):
-        for item in self.lb.curselection():
-            self.subject_name_var.set(self.subject_name_var.get() + str(self.lb.get(item)) + ',')
+        self.subject_name_var.set(len(self.lb.curselection()))
 
     def submit_form(self):
+        subject_name_list = []
+        for item in self.lb.curselection():
+            subject_name_list.append(str(self.lb.get(item)))
 
-        subject_name_list = self.subject_name_var.get().split(',')
-        del subject_name_list[-1]
         subject_id = ()
         subjectid_list = []
         self.connect_database()
-
-
         count = 0
         for subject in subject_name_list:
             self.cursor.execute("select subject_id from subject where subject=%s", subject)
@@ -530,9 +492,8 @@ class User_Page:
             count += 1
         self.con.commit()
         self.con.close()
-        print(subjectid_list)
         if not subjectid_list:
-            print("Empty")
+            messagebox.showerror("Error", "Please Select Your Subjects.", parent=self.edit_detail_frame)
         else:
             self.connect_database()
             self.cursor.execute("delete from assigned_subjects where teacher_id=%s", self.teacher_id)
@@ -550,11 +511,7 @@ class User_Page:
             self.con.close()
             self.edit_profile_frame.destroy()
             self.fetch_teacher_data()
-            messagebox.showinfo("Sucess", "Profile Updated Sucessfully.",
-                                 parent=self.profile_frame)
-
-
-
+            messagebox.showinfo("Sucess", "Profile Updated Sucessfully.", parent=self.profile_frame)
 
     def checkAttendanceButtonClicked(self):
         self.changeable_frame.destroy()
@@ -579,9 +536,6 @@ class User_Page:
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
         self.changeable_frame = Frame(self.user_page, bg='white')
         self.changeable_frame.place(x=165, y=60, height=675, width=1190)
-
-        self.checkAttendanceButton['state'] = 'normal'
-        self.checkStudentDetailButton['state'] = 'normal'
 
         self.profileButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'

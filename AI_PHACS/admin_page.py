@@ -1,12 +1,12 @@
-import os
 from tkinter import *
 from tkinter import ttk
-
 from tkinter import messagebox
 import pymysql
 import datetime
 import re
-from cryptography.fernet import Fernet
+from sessionGenerator import readId
+from database import connect_database
+
 
 class Admin_Page:
     def __init__(self, root):
@@ -16,11 +16,11 @@ class Admin_Page:
         self.create_widgets()
 
     def connect_database(self):
-        self.con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-        self.cursor = self.con.cursor()
+        result = connect_database()
+        self.con = result[0]
+        self.cursor = result[1]
 
     def create_widgets(self):
-
         self.trainingPhoto = PhotoImage(file="images/Start Training Final.png", master=self.admin_page)
         self.timetablePhoto = PhotoImage(file="images/Add Timetable Final.png", master=self.admin_page)
         self.studentPhoto = PhotoImage(file="images/Add Student Final.png", master=self.admin_page)
@@ -36,15 +36,7 @@ class Admin_Page:
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
-        with open('session_id.txt', 'r') as f:
-            lines = f.readlines()
-            key = lines[0].strip()
-            encrpted_text = lines[1].strip()
-        fer = Fernet(key.encode())
-        session_id = (fer.decrypt(encrpted_text.encode())).decode("utf-8")
-        self.connect_database()
-        self.cursor.execute("select username from register where reg_id=%s", session_id)
-        row_name = self.cursor.fetchall()
+        row_name = readId()
         self.user_logged_in_var = StringVar()
         if (len(row_name) != 0):
             self.user_logged_in_var.set(row_name[0][0])
@@ -103,21 +95,16 @@ class Admin_Page:
         interior_id = canvas.create_window(0, 0, window=interior,
                                            anchor=NW)
 
-        # track changes to the canvas and frame width and sync them,
-        # also updating the scrollbar
         def _configure_interior(event):
-            # update the scrollbars to match the size of the inner frame
             size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
             canvas.config(scrollregion="0 0 %s %s" % size)
             if interior.winfo_reqwidth() != canvas.winfo_width():
-                # update the canvas's width to fit the inner frame
-                canvas.config(width=interior.winfo_reqwidth())
+               canvas.config(width=interior.winfo_reqwidth())
 
         interior.bind('<Configure>', _configure_interior)
 
         def _configure_canvas(event):
             if interior.winfo_reqwidth() != canvas.winfo_width():
-                # update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
 
         canvas.bind('<Configure>', _configure_canvas)
@@ -174,9 +161,6 @@ class Admin_Page:
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.checkAttendanceButton['state'] = 'normal'
-
-        # s = ttk.Separator(self.changeable_frame, orient=VERTICAL)
-        # s.pack(side=TOP, fill="y", padx=345, pady=177)
 
         ###Variables
         self.student_name_var = StringVar()
@@ -277,9 +261,6 @@ class Admin_Page:
                             cursor='hand2', )
         upload_btn.pack(fill="both", expand=True, padx=1, pady=1)
         self.btn_border_frame.place(x=100, y=260, height=30, width=120)
-        # canvas = Canvas(self.add_student_frame, width=300, height=340)
-        # canvas.place(x=580, y=150)
-        # canvas.create_image(0, 0, anchor=NW, image=self.upload_Photo)
         add_student_submit_btn = Button(self.add_student_frame, text='Add Student', bg='#49a0ae', fg='white',
                                         font=('times new roman', 14, 'bold'), activebackground='#49a0ae',
                                         activeforeground='white',
@@ -296,24 +277,15 @@ class Admin_Page:
         self.dob_year_field_var.set('')
 
     def add_student_submit_clicked(self):
-        print("Adding NewStudent.....")
-        print("Checking validations.....")
         if self.validate_all_fields():
-            print(self.validate_number_field())
             if self.validate_number_field():
-                print(self.is_valid_email())
                 if self.is_valid_email():
-                    print("Validation Check Done.....")
-                    print("Connecting Database.....")
                     self.connect_database()
-                    print("Database Connected sucessfully")
                     if self.cursor.execute("select enroll_no from student where enroll_no=%s",
                                            self.enroll_no_field.get()):
-                        print("Student with Same enrollnment number exist.....")
-                        messagebox.showerror("Error",
+                         messagebox.showerror("Error",
                                              "Student With Same Enrollnment No. Exist, Try Different Enrollnment No.")
                     else:
-
                         self.cursor.execute(
                             "insert into student(enroll_no,name,email,dob,gender,phone_no,address,depart_id)"
                             "values(%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -328,9 +300,7 @@ class Admin_Page:
                                 self.address_field.get('1.0', END),
                                 (self.enroll_no_field.get()[7] + self.enroll_no_field.get()[8])
                             ))
-
                         self.con.commit()
-                        print("newStudent Added Sucessfully.....")
                         self.add_student_clear()
                         self.con.close()
                         messagebox.showinfo("sucess", "Data Added Sucessfully.")
@@ -338,7 +308,6 @@ class Admin_Page:
             print("validation of allFields Fails")
 
     def validate_all_fields(self):
-        # print(self.address_field.get('1.0', END) == '')
         if self.name_field.get() == '':
             messagebox.showerror("Error", "Please enter full name to proceed", parent=self.add_student_frame)
 

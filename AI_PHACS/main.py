@@ -1,22 +1,23 @@
 from tkinter import *
 from tkinter import messagebox
-import pymysql
-from cryptography.fernet import Fernet
+from sessionGenerator import writeId
+from database import connect_database
 
 class Main:
-
     def __init__(self, root):
-        print(root)
         self.root = root
         self.root.title("AI-PHACS | Developed By : Sudip, Ayush, Bhavyesh, Preet, Jay | MiniDeveloper")
-        # self.root.geometry('1200x900')
         self.root.state('zoomed')
         self.root.minsize()
-
         self.create_widgets()
 
     def close(self):
-        root.destroy()
+        self.root.destroy()
+
+    def connect_database(self):
+        result = connect_database()
+        self.con = result[0]
+        self.cursor = result[1]
 
     def create_widgets(self):
         self.AdminPhoto = PhotoImage(file="images/Admin.png", master=self.root)
@@ -34,28 +35,25 @@ class Main:
         banner_title = Label(banner_frame, text='Home Page', font=('Impact', 20, 'bold'), bg='#49a0ae', fg='white')
         banner_title.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-        self.normal_user = Button(root, image=self.UserPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0
+        self.normal_user = Button(self.root, image=self.UserPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0
                                   , cursor='hand2', command=self.user_window)
         self.normal_user.place(relx=0.4, rely=0.5, anchor=CENTER, width=430, height=200)
 
-        self.admin = Button(root, image=self.AdminPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0,
+        self.admin = Button(self.root, image=self.AdminPhoto, font=("times new roman", 15, 'bold'), bg=None, border=0,
                             cursor='hand2', command=self.admin_window)
         self.admin.place(relx=0.6, rely=0.5, anchor=CENTER, width=430, height=200)
 
     def user_window(self):
-
         self.root.withdraw()
-        self.user = Toplevel(root)
+        self.user = Toplevel(self.root)
 
         self.user.title("AI-PHACS | User Login Page")
         self.user.state('zoomed')
-        # self.user.geometry("1000x900")
         self.bg = PhotoImage(file="images/login-page-background.png", master=self.user)
         self.bg_image = Label(self.user, image=self.bg).place(x=0, y=0, relwidth=1, relheight=1)
         self.back = PhotoImage(file="images/back.png", master=self.user)
 
-        # import user_login
-        # print(user)
+
         backButton = Button(self.user, image=self.back, command=self.user_backClicked, border=0, height=60,
                             width=60, cursor='hand2', )
         backButton.place(x=20, y=90)
@@ -103,8 +101,7 @@ class Main:
 
     def admin_window(self):
         self.root.withdraw()
-
-        self.admin = Toplevel(root)
+        self.admin = Toplevel(self.root)
         self.admin.title("AI-PHACS | Admin Login Page")
         self.admin.state('zoomed')
         self.bg = PhotoImage(file="images/login-page-background.png", master=self.admin)
@@ -169,85 +166,50 @@ class Main:
     def user_submit_clicked(self):
         # check if user is Authorized OR Not!!
         if self.id_field.get() == "" or self.password_field.get() == "":
-
             messagebox.showerror("Error", "All Fields Are Required!!", parent=self.user)
         else:
             try:
-                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                cursor = con.cursor()
-
-                if cursor.execute(
+                self.connect_database()
+                if self.cursor.execute(
                         "select username,password from register where usertype=%s and username=%s and password=%s",
                         (
                                 'Teacher',
                                 self.id_field.get(),
                                 self.password_field.get()
                         )):
-
-                    cursor.execute("select reg_id from register where username=%s", self.id_field.get())
-                    row_id = cursor.fetchall()
+                    self.cursor.execute("select reg_id from register where username=%s", self.id_field.get())
+                    row_id = self.cursor.fetchall()
                     session_id = row_id[0][0]
-                    # print(session_id)
                     self.root.destroy()
-                    encoded_text = str(session_id).encode()
-                    key = Fernet.generate_key()
-                    print(key)
-                    f = Fernet(key)
-                    token = f.encrypt(encoded_text)
-                    ans = f.decrypt(token)
-                    print(ans.decode("utf-8"))
-                    with open('session_id.txt', 'w') as f:
-                        f.write(key.decode("utf-8"))
-                        f.write("\n")
-                        f.write(token.decode("utf-8"))
-
-
-
+                    writeId(session_id)
                     import user_page
                 else:
                     messagebox.showerror("Error", "UserName Or Password is Incorrect", parent=self.user)
                     self.user_clear()
-                con.close()
+                self.con.close()
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.user)
                 self.user_clear()
-            # print(cursor.execute("select username from register where usertype=%s and username=%s", ('Teacher', self.id_field.get())))
-            # print(self.id_field.get(), self.password_field.get())
 
     def admin_submit_clicked(self):
         if self.id_field.get() == "" or self.password_field.get() == "":
-
             messagebox.showerror("Error", "All Fields Are Required!!", parent=self.admin)
         else:
             try:
-                con = pymysql.connect(host='localhost', user='root', password='', database='ai_phacs')
-                cursor = con.cursor()
-                if cursor.execute(
+                self.connect_database()
+                if self.cursor.execute(
                         "select username,password from register where usertype=%s and username=%s and password=%s",
                         ('Admin', self.id_field.get(), self.password_field.get())):
-
-                    cursor.execute("select reg_id from register where username=%s", self.id_field.get())
-                    row_id = cursor.fetchall()
+                    self.cursor.execute("select reg_id from register where username=%s", self.id_field.get())
+                    row_id = self.cursor.fetchall()
                     session_id = row_id[0][0]
-                    print(session_id)
                     self.root.destroy()
-                    encoded_text = str(session_id).encode()
-                    key = Fernet.generate_key()
-                    f = Fernet(key)
-                    token = f.encrypt(encoded_text)
-                    ans = f.decrypt(token)
-                    print(ans.decode("utf-8"))
-                    with open('session_id.txt', 'w') as f:
-                        f.write(key.decode("utf-8"))
-                        f.write("\n")
-                        f.write(token.decode("utf-8"))
-
+                    writeId(session_id)
                     import admin_page
                 else:
-
                     messagebox.showerror("Error", "AdminName Or Password is Incorrect", parent=self.admin)
                     self.admin_clear()
-
+                self.con.close()
             except Exception as ex:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.admin)
                 self.admin_clear()
@@ -262,11 +224,5 @@ class Main:
 
 
 root = Tk()
-
-print(root)
-
 obj = Main(root)
-# self.user.protocol("WM_DELETE_WINDOW", root.destroy)
-# self.admin.protocol("WM_DELETE_WINDOW", root.destroy)
-# root.protocol("WM_DELETE_WINDOW", obj.close)
 root.mainloop()
