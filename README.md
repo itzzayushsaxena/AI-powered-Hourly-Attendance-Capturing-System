@@ -7,7 +7,7 @@
 
 #### Demo GIF.
 
-<img src="./checkout-demo.gif" alt="A gif of the Checkout payment page rendering" align="center">
+<img src="https://media.giphy.com/media/eMOPYIgYYorY66ypCm/giphy.gif" alt="A gif of the Demo!" align="center">
 
 ## Table of contents
 1. [Requirements](#-requirements)
