@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import pymysql
+from tkcalendar import *
 import datetime
 import re
 from sessionGenerator import readId
@@ -452,6 +452,7 @@ class Admin_Page:
 
         # dictionary
 
+
         self.data = {'Engineering': ["Computer", "Electrical", "Chemical", "Civil", "Mechanical"],
                      'xyz': ["xyz1", "zyz2"]}
         self.variable_a = StringVar()
@@ -616,10 +617,7 @@ class Admin_Page:
             self.edit_name_var.set(self.student_detail_row[2])
             self.edit_email_var = StringVar()
             self.edit_email_var.set(self.student_detail_row[5])
-            # print(datetime.datetime.strptime(self.student_detail_row[6], "%Y-%m-%d"))
             edit_dob = datetime.datetime.strptime(self.student_detail_row[7], "%Y-%m-%d")
-            # print(format(edit_dob.month,'02'))
-            # print(format(edit_dob.day, '02'))
             self.edit_date_var = StringVar()
             self.edit_date_var.set(format(edit_dob.day, '02'))
             self.edit_month_var = StringVar()
@@ -1022,8 +1020,6 @@ class Admin_Page:
         if self.id_field.get() == '' or self.user_type_combox.get() == '' or self.password_field.get() == '':
             messagebox.showerror("Error", "All field Are Required To Add User", parent=self.manage_user_frame)
         else:
-            # try:
-            # print(self.id_field.get(), self.password_field.get(), self.user_type_combox.get(), datetime.datetime.now().strftime('%Y-%m-%d'))
             try:
                 self.connect_database()
                 if self.cursor.execute("select username from register where username=%s", self.id_field.get()):
@@ -1174,8 +1170,300 @@ class Admin_Page:
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
-        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
-        self.changeable_frame.place(x=310, y=55, height=680, width=1050)
+        self.changeable_frame = Frame(self.admin_page, bg=None)
+        self.changeable_frame.place(x=160, y=55, height=680, width=1200)
+
+        tabControl = ttk.Notebook(self.changeable_frame)
+        self.tab1 = ttk.Frame(tabControl)
+        self.tab2 = ttk.Frame(tabControl)
+        self.tab3 = ttk.Frame(tabControl)
+
+        tabControl.add(self.tab1, text='Daily')
+        tabControl.add(self.tab2, text='Weekly')
+        tabControl.add(self.tab3, text='Monthly')
+
+        tabControl.pack(expand=1, fill="both")
+        #### ============================================= Tab 1  =============================================#####
+
+
+        tab1_filter_frame = Frame(self.tab1, bg='white')
+        tab1_filter_frame.place(relwidth=1, y=0, height=70)
+
+        tab1_attendance_frame = Frame(self.tab1, bg='white')
+        tab1_attendance_frame.place(relwidth=1, y=75, relheight=1)
+
+        self.confirmPhoto = PhotoImage(file="images/confirm.png")
+        self.cancelPhoto = PhotoImage(file="images/cancel.png")
+        ### Search
+
+        search = Label(tab1_filter_frame, text='Search By :', font=('times new roman', 12), bg='white',
+                       fg='black')
+        search.place(x=30, y=20)
+
+        stream = Label(tab1_filter_frame, text='Stream', font=('Goudy old style', 12, 'bold'), fg='gray',
+                       bg='white')
+        stream.place(x=140, y=20)
+
+        department = Label(tab1_filter_frame, text='Department', font=('Goudy old style', 12, 'bold'),
+                           fg='gray',
+                           bg='white')
+        department.place(x=390, y=20)
+
+        # dictionary
+
+        self.data = {'Engineering': ["Computer", "Electrical", "Chemical", "Civil", "Mechanical"],
+                     'xyz': ["xyz1", "zyz2"]}
+        self.variable_a = StringVar()
+        self.variable_b = StringVar()
+
+        self.variable_a.trace('w', self.update_options_B)
+
+        self.optionmenu_a = OptionMenu(tab1_filter_frame, self.variable_a, *self.data.keys())
+        self.optionmenu_b = OptionMenu(tab1_filter_frame, self.variable_b, '')
+
+        self.variable_a.set('Engineering')
+
+        self.optionmenu_a.place(x=200, y=20, width=150, height=25)
+
+        self.optionmenu_b.place(x=490, y=20, width=150, height=25)
+
+
+        self.calendarPhoto = PhotoImage(file="images/calendar_32.png", master=tab1_filter_frame)
+        date = Label(tab1_filter_frame, text='Date', font=('Goudy old style', 12, 'bold'), fg='gray',
+                       bg='white')
+        date.place(x=680, y=20)
+        Button(self.tab1, image=self.calendarPhoto, command=self.calendarClicked, border=0,
+                            height=40, width=40, cursor='hand2', bg="white", activebackground="white", ).place(x=730, y=10)
+
+        search_btn = Button(tab1_filter_frame, text='Search', bg='#49a0ae', fg='white',
+                            font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', command=self.tab1SearchClicked)
+        search_btn.place(x=800, y=22, width=60, height=22)
+
+        # Table Frame
+        tab1_table_frame = Frame(tab1_attendance_frame, bd=4, relief=RIDGE, bg='white', )
+        tab1_table_frame.place(x=5, y=5, width=1185, height=570)
+
+        scroll_horizon = Scrollbar(tab1_table_frame, orient=HORIZONTAL)
+        scroll_vertical = Scrollbar(tab1_table_frame, orient=VERTICAL)
+        self.student_daily_attendance_table = ttk.Treeview(tab1_table_frame,
+                                               columns=(
+                                                   "srno", "enroll_no", "name", "perc", "lect1", "lect2", "lect3",
+                                                   "lect4", "lect5", "lect6", "lectAttended"),
+                                               xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
+        scroll_horizon.pack(side=BOTTOM, fill=X)
+        scroll_vertical.pack(side=RIGHT, fill=Y)
+        scroll_horizon.config(command=self.student_daily_attendance_table.xview)
+        scroll_vertical.config(command=self.student_daily_attendance_table.yview)
+        self.student_daily_attendance_table.heading("srno", text="SrNo.")
+        self.student_daily_attendance_table.column("srno", width=50)
+        self.student_daily_attendance_table.heading("enroll_no", text="EnrollNo.")
+        self.student_daily_attendance_table.column("enroll_no", width=130)
+        self.student_daily_attendance_table.heading("name", text="Student Name")
+        self.student_daily_attendance_table.column("name", width=220)
+        self.student_daily_attendance_table.heading("perc", text="% Attd..")
+        self.student_daily_attendance_table.column("perc", width=50)
+        self.student_daily_attendance_table.heading("lect1", text="L-1")
+        self.student_daily_attendance_table.column("lect1", width=50)
+        self.student_daily_attendance_table.heading("lect2", text="L-2")
+        self.student_daily_attendance_table.column("lect2", width=50)
+        self.student_daily_attendance_table.heading("lect3", text="L-3")
+        self.student_daily_attendance_table.column("lect3", width=50)
+        self.student_daily_attendance_table.heading("lect4", text="L-4")
+        self.student_daily_attendance_table.column("lect4", width=50)
+        self.student_daily_attendance_table.heading("lect5", text="L-5")
+        self.student_daily_attendance_table.column("lect5", width=50)
+        self.student_daily_attendance_table.heading("lect6", text="L-6")
+        self.student_daily_attendance_table.column("lect6", width=50)
+        self.student_daily_attendance_table.heading("lectAttended", text="Lec-Attended")
+        self.student_daily_attendance_table.column("lectAttended", width=150)
+        self.student_daily_attendance_table['show'] = 'headings'
+        self.student_daily_attendance_table.pack(fill=BOTH, expand=1)
+        #### ============================================= Tab 2  =============================================#####
+
+        tab2_filter_frame = Frame(self.tab2, bg='white')
+        tab2_filter_frame.place(relwidth=1, y=0, height=70)
+
+        tab2_attendance_frame = Frame(self.tab2, bg='white')
+        tab2_attendance_frame.place(relwidth=1, y=75, relheight=1)
+
+        ### Search
+
+        search = Label(tab2_filter_frame, text='Search By :', font=('times new roman', 12), bg='white',
+                       fg='black')
+        search.place(x=30, y=20)
+
+        stream = Label(tab2_filter_frame, text='Stream', font=('Goudy old style', 12, 'bold'), fg='gray',
+                       bg='white')
+        stream.place(x=140, y=20)
+
+        department = Label(tab2_filter_frame, text='Department', font=('Goudy old style', 12, 'bold'),
+                           fg='gray',
+                           bg='white')
+        department.place(x=340, y=20)
+
+        # dictionary
+
+        self.data = {'Engineering': ["Computer", "Electrical", "Chemical", "Civil", "Mechanical"],
+                     'xyz': ["xyz1", "zyz2"]}
+        self.variable_a = StringVar()
+        self.variable_b = StringVar()
+
+        self.variable_a.trace('w', self.update_options_B)
+
+        self.optionmenu_a = OptionMenu(tab2_filter_frame, self.variable_a, *self.data.keys())
+        self.optionmenu_b = OptionMenu(tab2_filter_frame, self.variable_b, '')
+
+        self.variable_a.set('Engineering')
+
+        self.optionmenu_a.place(x=200, y=20, width=100, height=25)
+
+        self.optionmenu_b.place(x=440, y=20, width=100, height=25)
+
+        month = Label(tab2_filter_frame, text='Month', font=('Goudy old style', 12, 'bold'),
+                           fg='gray', bg='white')
+        month.place(x=590, y=20)
+        self.tab2_month_combox = ttk.Combobox(tab2_filter_frame, font=('times new roman', 12), state='readonly')
+        self.tab2_month_combox['values'] = ("Jan", "Feb", "Mar", "April", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec")
+        self.tab2_month_combox.place(x=650, y=20, width=100, height=22)
+
+        week = Label(tab2_filter_frame, text='Week', font=('Goudy old style', 12, 'bold'),
+                      fg='gray', bg='white')
+        week.place(x=790, y=20)
+        self.tab2_week_combox = ttk.Combobox(tab2_filter_frame, font=('times new roman', 12), state='readonly')
+        self.tab2_week_combox['values'] = ("Week1", "Week2", "Week3", "Week4", "Week5")
+        self.tab2_week_combox.place(x=840, y=20, width=100, height=22)
+
+        Label(tab2_filter_frame, text='Day', font=('Goudy old style', 12, 'bold'), fg='gray', bg='white').place(x=990, y=20)
+        day = Label(tab2_filter_frame, text='27-30', font=('Goudy old style', 12, 'bold'),
+                    fg='gray', bg='white')
+        day.place(x=1025, y=20)
+
+        search_btn = Button(tab2_filter_frame, text='Search', bg='#49a0ae', fg='white',
+                            font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', command=self.tab2SearchClicked)
+        search_btn.place(x=1100, y=22, width=60, height=22)
+
+        # Table Frame
+        tab2_table_frame = Frame(tab2_attendance_frame, bd=4, relief=RIDGE, bg='white', )
+        tab2_table_frame.place(x=5, y=5, width=1185, height=570)
+
+        scroll_horizon = Scrollbar(tab2_table_frame, orient=HORIZONTAL)
+        scroll_vertical = Scrollbar(tab2_table_frame, orient=VERTICAL)
+        self.student_weekly_attendance_table = ttk.Treeview(tab2_table_frame,
+                                               columns=(
+                                                   "srno", "enroll_no", "name", "perc", "abperc", "lectAttended"),
+                                               xscrollcommand=scroll_horizon.set, yscrollcommand=scroll_vertical.set)
+        scroll_horizon.pack(side=BOTTOM, fill=X)
+        scroll_vertical.pack(side=RIGHT, fill=Y)
+        scroll_horizon.config(command=self.student_weekly_attendance_table.xview)
+        scroll_vertical.config(command=self.student_weekly_attendance_table.yview)
+        self.student_weekly_attendance_table.heading("srno", text="SrNo.")
+        self.student_weekly_attendance_table.column("srno", width=50)
+        self.student_weekly_attendance_table.heading("enroll_no", text="EnrollNo.")
+        self.student_weekly_attendance_table.column("enroll_no", width=130)
+        self.student_weekly_attendance_table.heading("name", text="Student Name")
+        self.student_weekly_attendance_table.column("name", width=220)
+        self.student_weekly_attendance_table.heading("perc", text="% Attd..")
+        self.student_weekly_attendance_table.column("perc", width=50)
+        self.student_weekly_attendance_table.heading("abperc", text="% Absnt..")
+        self.student_weekly_attendance_table.column("abperc", width=50)
+        self.student_weekly_attendance_table.heading("lectAttended", text="Lec-Attended")
+        self.student_weekly_attendance_table.column("lectAttended", width=150)
+        self.student_weekly_attendance_table['show'] = 'headings'
+        self.student_weekly_attendance_table.pack(fill=BOTH, expand=1)
+
+        #### ============================================= Tab 3  =============================================#####
+
+        tab3_filter_frame = Frame(self.tab3, bg='white')
+        tab3_filter_frame.place(relwidth=1, y=0, height=70)
+
+        tab3_attendance_frame = Frame(self.tab3, bg='white')
+        tab3_attendance_frame.place(relwidth=1, y=75, relheight=1)
+
+        ### Search
+
+        search = Label(tab3_filter_frame, text='Search By :', font=('times new roman', 12), bg='white',
+                       fg='black')
+        search.place(x=30, y=20)
+
+        stream = Label(tab3_filter_frame, text='Stream', font=('Goudy old style', 12, 'bold'), fg='gray',
+                       bg='white')
+        stream.place(x=140, y=20)
+
+        department = Label(tab3_filter_frame, text='Department', font=('Goudy old style', 12, 'bold'),
+                           fg='gray',
+                           bg='white')
+        department.place(x=340, y=20)
+
+        # dictionary
+
+        self.data = {'Engineering': ["Computer", "Electrical", "Chemical", "Civil", "Mechanical"],
+                     'xyz': ["xyz1", "zyz2"]}
+        self.variable_a = StringVar()
+        self.variable_b = StringVar()
+
+        self.variable_a.trace('w', self.update_options_B)
+
+        self.optionmenu_a = OptionMenu(tab3_filter_frame, self.variable_a, *self.data.keys())
+        self.optionmenu_b = OptionMenu(tab3_filter_frame, self.variable_b, '')
+
+        self.variable_a.set('Engineering')
+
+        self.optionmenu_a.place(x=200, y=20, width=100, height=25)
+
+        self.optionmenu_b.place(x=440, y=20, width=100, height=25)
+
+        year = Label(tab3_filter_frame, text='Year', font=('Goudy old style', 12, 'bold'),
+                     fg='gray', bg='white')
+        year.place(x=590, y=20)
+        self.tab3_year_combox = ttk.Combobox(tab3_filter_frame, font=('times new roman', 12), state='readonly')
+        self.tab3_year_combox['values'] = ("2020", "2019")
+        self.tab3_year_combox.place(x=640, y=20, width=100, height=22)
+
+        month = Label(tab3_filter_frame, text='Month', font=('Goudy old style', 12, 'bold'),
+                      fg='gray', bg='white')
+        month.place(x=790, y=20)
+        self.tab3_month_combox = ttk.Combobox(tab3_filter_frame, font=('times new roman', 12), state='readonly')
+        self.tab3_month_combox['values'] = ("Jan", "Feb", "Mar", "April", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec")
+        self.tab3_month_combox.place(x=860, y=20, width=100, height=22)
+
+        search_btn = Button(tab3_filter_frame, text='Search', bg='#49a0ae', fg='white',
+                            font=('times new roman', 12), activebackground='#49a0ae', activeforeground='white',
+                            cursor='hand2', command=self.tab3SearchClicked)
+        search_btn.place(x=1000, y=22, width=60, height=22)
+
+
+        # Table Frame
+        tab3_table_frame = Frame(tab3_attendance_frame, bd=4, relief=RIDGE, bg='white', )
+        tab3_table_frame.place(x=5, y=5, width=1185, height=570)
+
+        scroll_horizon = Scrollbar(tab3_table_frame, orient=HORIZONTAL)
+        scroll_vertical = Scrollbar(tab3_table_frame, orient=VERTICAL)
+        self.student_monthly_attendance_table = ttk.Treeview(tab3_table_frame,
+                                                            columns=(
+                                                                "srno", "enroll_no", "name", "perc", "abperc",
+                                                                "lectAttended"),
+                                                            xscrollcommand=scroll_horizon.set,
+                                                            yscrollcommand=scroll_vertical.set)
+        scroll_horizon.pack(side=BOTTOM, fill=X)
+        scroll_vertical.pack(side=RIGHT, fill=Y)
+        scroll_horizon.config(command=self.student_monthly_attendance_table.xview)
+        scroll_vertical.config(command=self.student_monthly_attendance_table.yview)
+        self.student_monthly_attendance_table.heading("srno", text="SrNo.")
+        self.student_monthly_attendance_table.column("srno", width=50)
+        self.student_monthly_attendance_table.heading("enroll_no", text="EnrollNo.")
+        self.student_monthly_attendance_table.column("enroll_no", width=130)
+        self.student_monthly_attendance_table.heading("name", text="Student Name")
+        self.student_monthly_attendance_table.column("name", width=220)
+        self.student_monthly_attendance_table.heading("perc", text="% Attd..")
+        self.student_monthly_attendance_table.column("perc", width=50)
+        self.student_monthly_attendance_table.heading("abperc", text="% Absnt..")
+        self.student_monthly_attendance_table.column("abperc", width=50)
+        self.student_monthly_attendance_table.heading("lectAttended", text="Lec-Attended")
+        self.student_monthly_attendance_table.column("lectAttended", width=150)
+        self.student_monthly_attendance_table['show'] = 'headings'
+        self.student_monthly_attendance_table.pack(fill=BOTH, expand=1)
 
         self.checkAttendanceButton['state'] = 'disable'
         self.addTimeTableButton['state'] = 'normal'
@@ -1183,7 +1471,34 @@ class Admin_Page:
         self.checkDetailButton['state'] = 'normal'
         self.addUserButton['state'] = 'normal'
         self.addStudentButton['state'] = 'normal'
-        print('sucess')
+
+    def calendarClicked(self):
+        self.date_frame = Frame(self.tab1, bg='green')
+        self.date_frame.place(x=770, y=10, width=290, height=187)
+
+        # To get Date -- cal.get_date()
+        cal = Calendar(self.date_frame, selectmode="day", year=2020, month=5, day=22)
+        cal.place(x=0, y=0)
+
+        confirm = Button(self.date_frame, image=self.confirmPhoto, command=self.confirmClicked, border=0,
+                         height=40, width=40, cursor='hand2', bg="green", activebackground="green", )
+        confirm.place(x=250, y=30)
+        cancel = Button(self.date_frame, image=self.cancelPhoto, command=self.cancelClicked, border=0,
+                        height=40, width=40, cursor='hand2', bg="green", activebackground="green", )
+        cancel.place(x=250, y=0)
+
+    def confirmClicked(self):
+        pass
+
+    def cancelClicked(self):
+        self.date_frame.destroy()
+
+    def tab1SearchClicked(self):
+        pass
+    def tab2SearchClicked(self):
+        pass
+    def tab3SearchClicked(self):
+        pass
 
     #### ============================================= Add Timetable      =============================================#####
     #### ==============================================================================================================#####
