@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 02, 2020 at 11:03 AM
+-- Generation Time: Feb 16, 2021 at 08:11 AM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.2.32
 
@@ -20,6 +20,25 @@ SET time_zone = "+00:00";
 --
 -- Database: `ai_phacs`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assigned_subjects`
+--
+
+CREATE TABLE `assigned_subjects` (
+  `teacher_id` int(3) NOT NULL,
+  `subject_id` int(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `assigned_subjects`
+--
+
+INSERT INTO `assigned_subjects` (`teacher_id`, `subject_id`) VALUES
+(4, 7),
+(4, 9);
 
 -- --------------------------------------------------------
 
@@ -97,10 +116,10 @@ CREATE TABLE `register` (
 --
 
 INSERT INTO `register` (`reg_id`, `username`, `date`, `usertype`, `password`) VALUES
-(1, 'sudip', '2020-08-21', 'Admin', 'sudip'),
-(3, 'teacher', '2020-08-21', 'Teacher', 'teacher'),
-(4, 'sudip13', '2020-08-23', 'Admin', 'sudip1'),
-(14, 'bhavyesh', '2020-08-23', 'Admin', 'bhavyesh');
+(26, 'sudip', '2020-09-29', 'Admin', 'sudip'),
+(27, 'bhavyesh', '2020-09-29', 'Admin', 'bhavyesh'),
+(29, 'pradip', '2020-09-29', 'Admin', 'pradip'),
+(31, 'teacher', '2020-10-04', 'Teacher', 'teacher');
 
 -- --------------------------------------------------------
 
@@ -136,7 +155,8 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`enroll_no`, `name`, `email`, `dob`, `gender`, `phone_no`, `address`, `depart_id`) VALUES
 ('181230106017', 'Sudip', 'sudip@gmail.com', '1998-11-22', 'M', '1234592345', 'navsari\n\n\n\n', 6),
-('181230106019', 'preet', 'preet@gmail.com', '1998-10-30', 'M', '1234123478', 'surat\n', 6),
+('181230106019', 'preet', 'preet@gmail.com', '1998-10-30', 'M', '1234123478', 'surat\n\n\n\n\n', 6),
+('181230107002', 'ayush', 'ayush@gmail.com', '2000-07-23', 'M', '1234567890', '\n', 7),
 ('181230107024', 'jay', 'jay@gmail.com', '1999-11-22', 'M', '1234123412', 'navsari\n\n', 7);
 
 -- --------------------------------------------------------
@@ -150,6 +170,21 @@ CREATE TABLE `subject` (
   `subject` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `subject`
+--
+
+INSERT INTO `subject` (`subject_id`, `subject`) VALUES
+(1, 'D.S.'),
+(2, 'D.B.M.S'),
+(3, 'MATH-1'),
+(4, 'MATH-2'),
+(5, 'MATH-3'),
+(7, 'python with datascience'),
+(8, 'A.D.A'),
+(9, 'software Engineering'),
+(10, 'E.S');
+
 -- --------------------------------------------------------
 
 --
@@ -160,10 +195,19 @@ CREATE TABLE `teacher` (
   `teacher_id` int(3) NOT NULL,
   `reg_id` int(2) NOT NULL,
   `name` varchar(60) NOT NULL,
-  `dob` date NOT NULL,
+  `email` varchar(40) NOT NULL,
+  `dob` date DEFAULT NULL,
   `gender` char(1) NOT NULL,
-  `address` text NOT NULL
+  `address` text NOT NULL,
+  `phone_no` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `teacher`
+--
+
+INSERT INTO `teacher` (`teacher_id`, `reg_id`, `name`, `email`, `dob`, `gender`, `address`, `phone_no`) VALUES
+(4, 31, 'sudip karmakar', 'sudip@gmail.com', '2000-01-01', 'M', 'navsari\n\n\n\n\n\n\n\n\n\n\n\n', '1234567890');
 
 -- --------------------------------------------------------
 
@@ -183,6 +227,13 @@ CREATE TABLE `timetable` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `assigned_subjects`
+--
+ALTER TABLE `assigned_subjects`
+  ADD KEY `teacher_id` (`teacher_id`,`subject_id`),
+  ADD KEY `subject_id` (`subject_id`);
 
 --
 -- Indexes for table `attendance`
@@ -264,7 +315,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `register`
 --
 ALTER TABLE `register`
-  MODIFY `reg_id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `reg_id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `session`
@@ -276,13 +327,13 @@ ALTER TABLE `session`
 -- AUTO_INCREMENT for table `subject`
 --
 ALTER TABLE `subject`
-  MODIFY `subject_id` int(3) NOT NULL AUTO_INCREMENT;
+  MODIFY `subject_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `teacher`
 --
 ALTER TABLE `teacher`
-  MODIFY `teacher_id` int(3) NOT NULL AUTO_INCREMENT;
+  MODIFY `teacher_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `timetable`
@@ -293,6 +344,13 @@ ALTER TABLE `timetable`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `assigned_subjects`
+--
+ALTER TABLE `assigned_subjects`
+  ADD CONSTRAINT `assigned_subjects_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `assigned_subjects_ibfk_2` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `attendance`
