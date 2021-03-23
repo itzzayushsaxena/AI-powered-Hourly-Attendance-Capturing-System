@@ -3,18 +3,24 @@ from tkinter import messagebox
 from sessionGenerator import writeId
 from database import connect_database
 
+# see last 3 line the system starts from there.
+
 class Main:
+    # __init__ is how we define constructor for class in python.
     def __init__(self, root):
         self.root = root
         self.root.title("AI-PHACS | Developed By : Sudip, Ayush, Bhavyesh, Preet, Jay | MiniDeveloper")
         self.root.state('zoomed')
         self.root.minsize()
+
+        # to draw widgets on window.
         self.create_widgets()
 
     def close(self):
         self.root.destroy()
 
     def connect_database(self):
+        # connect_database is a module to connect with database.
         result = connect_database()
         self.con = result[0]
         self.cursor = result[1]
@@ -23,7 +29,7 @@ class Main:
         self.AdminPhoto = PhotoImage(file="images/Admin.png", master=self.root)
         self.UserPhoto = PhotoImage(file="images/User2.png", master=self.root)
 
-        ## Variables
+        # Variables
         self.user_id_var = StringVar()
         self.user_pass_var = StringVar()
         self.admin_id_var = StringVar()
@@ -43,6 +49,7 @@ class Main:
                             cursor='hand2', command=self.admin_window)
         self.admin.place(relx=0.6, rely=0.5, anchor=CENTER, width=430, height=200)
 
+    # called on user btn clicked
     def user_window(self):
         self.root.withdraw()
         self.user = Toplevel(self.root)
@@ -99,6 +106,7 @@ class Main:
         login_btn.place(x=90, y=350, width=100, height=35)
         self.user.protocol("WM_DELETE_WINDOW", self.close)
 
+    # called on admin btn clicked
     def admin_window(self):
         self.root.withdraw()
         self.admin = Toplevel(self.root)
@@ -153,16 +161,19 @@ class Main:
         login_btn.place(x=90, y=350, width=100, height=35)
         self.admin.protocol("WM_DELETE_WINDOW", self.close)
 
+    # back btn on user's login page
     def user_backClicked(self):
         self.user.withdraw()
         self.root.deiconify()
         self.root.state('zoomed')
 
+    # back btn on admin's login page
     def admin_backClicked(self):
         self.admin.withdraw()
         self.root.deiconify()
         self.root.state('zoomed')
 
+    # user's login submit btn clicked
     def user_submit_clicked(self):
         # check if user is Authorized OR Not!!
         if self.id_field.get() == "" or self.password_field.get() == "":
@@ -191,6 +202,7 @@ class Main:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.user)
                 self.user_clear()
 
+    # admin's login submit btn clicked
     def admin_submit_clicked(self):
         if self.id_field.get() == "" or self.password_field.get() == "":
             messagebox.showerror("Error", "All Fields Are Required!!", parent=self.admin)
@@ -206,6 +218,8 @@ class Main:
                     self.root.destroy()
                     writeId(session_id)
                     import admin_page
+
+
                 else:
                     messagebox.showerror("Error", "AdminName Or Password is Incorrect", parent=self.admin)
                     self.admin_clear()
@@ -214,15 +228,21 @@ class Main:
                 messagebox.showerror("Error", f"Action Failed Due To: {str(ex)}", parent=self.admin)
                 self.admin_clear()
 
+    # before user's page called form is cleared
     def user_clear(self):
         self.user_id_var.set('')
         self.user_pass_var.set('')
 
+    # before admin's page called form is cleared
     def admin_clear(self):
         self.admin_id_var.set('')
         self.admin_pass_var.set('')
 
-
+# created empty window.
 root = Tk()
+
+# called Main constructor.
 obj = Main(root)
+
+# this will hold the window to visible untill close btn pressed.
 root.mainloop()

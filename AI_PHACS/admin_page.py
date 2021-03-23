@@ -1,12 +1,14 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
-from tkcalendar import *
 import datetime
-import re
-from sessionGenerator import readId
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
+from tkcalendar import *
 from database import connect_database
-
+from sessionGenerator import readId
+from testCamera import test_camera
+from captureFrames import capture_frames
+from TrainImage import train_model
+from Recognize import recognize
 
 class Admin_Page:
     def __init__(self, root):
@@ -258,7 +260,7 @@ class Admin_Page:
         self.btn_border_frame = Frame(self.upload_image_frame, bg="#F97C14")
         upload_btn = Button(self.btn_border_frame, text='Upload Image', bd=0, fg='#F97C14',
                             font=('times new roman', 14, 'bold'), activebackground='#F97C14', activeforeground='white',
-                            cursor='hand2', )
+                            cursor='hand2', command=self.upload_btn_clicked)
         upload_btn.pack(fill="both", expand=True, padx=1, pady=1)
         self.btn_border_frame.place(x=100, y=260, height=30, width=120)
         add_student_submit_btn = Button(self.add_student_frame, text='Add Student', bg='#49a0ae', fg='white',
@@ -266,6 +268,38 @@ class Admin_Page:
                                         activeforeground='white',
                                         cursor='hand2', command=self.add_student_submit_clicked)
         add_student_submit_btn.place(x=495, y=575)
+
+    def testing_camera(self):
+        test_camera()
+
+    def capturing_frames(self):
+        if self.validate_all_fields():
+            if self.validate_number_field():
+                value = capture_frames(str(self.enroll_no_var.get()), str(self.student_name_var.get()))
+                if (value == 'same-id'):
+                    messagebox.showerror("Error", "Student With Same Enrollnment No. Exist in csv file.")
+                elif (value == 'face-cascade-loading-error'):
+                    messagebox.showerror("Error", "Error loading face cascade.")
+                elif (value == 'video-open-error'):
+                    messagebox.showerror("Error", "Error opening video capture.")
+                elif (value == 'no-capture-frame'):
+                    messagebox.showerror("Error", "No Capture Frame.")
+                elif (value == ''):
+                    self.successfully_captured_frames = True
+
+    def upload_btn_clicked(self):
+    # TODO : calling system-backend to click 100 frames of student's face.
+    # TODO : Or we can give option to upload a images may be more than 2 to scan it.
+
+        m = messagebox.askyesno("Virtual Assistant", "Do You Want to test the camera first?")
+
+        # if user presses yes or no.
+        if m:
+            self.testing_camera()
+
+        else:
+           self.capturing_frames()
+
 
     def date_selected(self, event):
         self.dob_date_field_var.set('')
@@ -286,6 +320,7 @@ class Admin_Page:
                          messagebox.showerror("Error",
                                              "Student With Same Enrollnment No. Exist, Try Different Enrollnment No.")
                     else:
+                        # TODO : upload btn, student frames checking goes here
                         self.cursor.execute(
                             "insert into student(enroll_no,name,email,dob,gender,phone_no,address,depart_id)"
                             "values(%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -384,7 +419,7 @@ class Admin_Page:
                                   font=('times new roman', 20, 'bold'), bg='#49a0ae', fg='white')
         self.banner_title.place(relx=0.4, rely=0.5, anchor=CENTER)
 
-        self.changeable_frame = Frame(self.admin_page, bg='#49a0ae')
+        self.changeable_frame = Frame(self.admin_page, bg='white')
         self.changeable_frame.place(x=160, y=55, height=680, width=1200)
 
         self.trainButton['state'] = 'disable'
@@ -394,6 +429,30 @@ class Admin_Page:
         self.addUserButton['state'] = 'normal'
         self.addStudentButton['state'] = 'normal'
 
+        training_btn = Button(self.changeable_frame, text='Train The Model', bg='#49a0ae', fg='white',
+                                        font=('times new roman', 14, 'bold'), activebackground='#49a0ae',
+                                        activeforeground='white',
+                                        cursor='hand2', command=self.train_model_clicked)
+        training_btn.place(x=405, y=75)
+
+        recognize_btn = Button(self.changeable_frame, text='Recognize the Student', bg='#49a0ae', fg='white',
+                              font=('times new roman', 14, 'bold'), activebackground='#49a0ae',
+                              activeforeground='white',
+                              cursor='hand2', command=self.recognize_student_clicked)
+        recognize_btn.place(x=385, y=175)
+
+    def recognize_student_clicked(self):
+        result = recognize()
+        if(result == 'training-pending'):
+            messagebox.showerror("Error", "Please train the data first.")
+        elif(result == 'sucess'):
+            messagebox.showinfo("sucess", "Attendance marked successfully!")
+
+
+    def train_model_clicked(self):
+        result = train_model()
+        if (result):
+            messagebox.showinfo("sucess", "Model Training Done!")
     #### ============================================= Check Detail       =============================================#####
     #### ==============================================================================================================#####
 
@@ -1529,7 +1588,6 @@ class Admin_Page:
             f.write("")
 
         self.admin_page.destroy()
-        import main
 
 
 root = Tk()
