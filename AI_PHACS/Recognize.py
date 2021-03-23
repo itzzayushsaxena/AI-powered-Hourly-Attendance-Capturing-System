@@ -42,8 +42,11 @@ def recognize():
         for(x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x+w, y+h), (255,0,0), 2)
             Id, conf = recognizer.predict(gray[y:y+h, x:x+w])
-            # print(conf)
+            print(conf)
+
+            # TODO : To ask what this line do?
             name = df.loc[df['Id'] == Id]['Name'].values
+            # print(df.loc[df['Id'] == Id])
             name = name[0]
 
             if conf < 50:

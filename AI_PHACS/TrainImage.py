@@ -34,8 +34,11 @@ from threading import Thread
 
 # -------------- image labesl ------------------------
 def getImagesAndLabels(path):
+
+
     # get the path of all the files in the folder
     imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
+    # print(imagePaths)
 
     # create empty face list
     faces = []
@@ -45,11 +48,13 @@ def getImagesAndLabels(path):
     for imagePath in imagePaths:
         # loading the image and converting it to gray scale
         pilImage = Image.open(imagePath).convert('L')
+        # print(pilImage)
         # Now we are converting the PIL image into numpy array
         imageNp = np.array(pilImage)
         # getting the Id from the image
         Id = int(os.path.split(imagePath)[1].split("_")[1])
-        
+        # print(os.path.split(imagePath)[1].split("_")[1])
+
         # extract the face from the training image sample
         faces.append(imageNp)
         Ids.append(Id)
@@ -59,7 +64,8 @@ def getImagesAndLabels(path):
 # ----------- train images function ---------------
 def train_model():
     recognizer = cv2.face_LBPHFaceRecognizer.create()
-    faces, Id = getImagesAndLabels("Images")
-    Thread(target = recognizer.train(faces, np.array(Id))).start()
+    faces, Ids = getImagesAndLabels("captured_images")
+    Thread(target = recognizer.train(faces, np.array(Ids))).start()
     recognizer.save("TrainingImageLabel"+os.sep+"Trainner.yml")
+    # print("TrainingImageLabel"+os.sep+"Trainner.yml")
     return True
