@@ -23,30 +23,43 @@ import pandas as pd
 
 def recognize():
     fname = "TrainingImageLabel/Trainner.yml"
+
     if not os.path.isfile(fname):
-        return 'training-pending'
+        return 'yml-file-absent'
 
     faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     cap = cv2.VideoCapture(0)
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     recognizer.read(fname)
 
+    # TODO : implement fetching from database here,
+
+    #  data in studentDetails.csv represent that student's frames are captured.
     df = pd.read_csv("StudentDetails.csv")
+    #
+
+
+
     col_names = ['Id', 'Name', 'Date', 'Time']
+    # attendance = pd.DataFrame(df)
     attendance = pd.DataFrame(columns=col_names)
 
-    while True:
+
+    while 1:
         ret, img = cap.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(gray, 1.3, 5)
         for(x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x+w, y+h), (255,0,0), 2)
-            Id, conf = recognizer.predict(gray[y:y+h, x:x+w])
-            print(conf)
+            cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
-            # TODO : To ask what this line do?
+            # Id & conf fetched from trainner.yml file
+            Id, conf = recognizer.predict(gray[y:y+h, x:x+w])
+            # print(conf, Id)
+            # conf = 40
+            Id = str(Id)
+            Id = int(Id[:2] + '123' + Id[2:])
+
             name = df.loc[df['Id'] == Id]['Name'].values
-            # print(df.loc[df['Id'] == Id])
             name = name[0]
 
             if conf < 50:

@@ -285,7 +285,8 @@ class Admin_Page:
                 elif (value == 'no-capture-frame'):
                     messagebox.showerror("Error", "No Capture Frame.")
                 elif (value == ''):
-                    self.successfully_captured_frames = True
+                    messagebox.showinfo("success", "Frames Captured Successfully. Now you can Submit the Form.")
+                    # self.successfully_captured_frames = True
 
     def upload_btn_clicked(self):
     # TODO : calling system-backend to click 100 frames of student's face.
@@ -296,9 +297,8 @@ class Admin_Page:
         # if user presses yes or no.
         if m:
             self.testing_camera()
-
         else:
-           self.capturing_frames()
+            self.capturing_frames()
 
 
     def date_selected(self, event):
@@ -314,13 +314,14 @@ class Admin_Page:
         if self.validate_all_fields():
             if self.validate_number_field():
                 if self.is_valid_email():
+                    # TODO : upload btn pressed or not will be checked first before applying submit btn's
+                    #  functionalities to add info to db.
                     self.connect_database()
                     if self.cursor.execute("select enroll_no from student where enroll_no=%s",
                                            self.enroll_no_field.get()):
                          messagebox.showerror("Error",
                                              "Student With Same Enrollnment No. Exist, Try Different Enrollnment No.")
                     else:
-                        # TODO : upload btn, student frames checking goes here
                         self.cursor.execute(
                             "insert into student(enroll_no,name,email,dob,gender,phone_no,address,depart_id)"
                             "values(%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -443,7 +444,7 @@ class Admin_Page:
 
     def recognize_student_clicked(self):
         result = recognize()
-        if(result == 'training-pending'):
+        if(result == 'yml-file-absent'):
             messagebox.showerror("Error", "Please train the data first.")
         elif(result == 'sucess'):
             messagebox.showinfo("sucess", "Attendance marked successfully!")

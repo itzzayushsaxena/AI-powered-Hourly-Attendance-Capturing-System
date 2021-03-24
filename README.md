@@ -10,16 +10,26 @@
 <img src="https://media.giphy.com/media/eMOPYIgYYorY66ypCm/giphy.gif" alt="A gif of the Demo!" align="center">
 
 ## Table of contents
-1. [Requirements](#-requirements)
-2. [Technology Used](#-technology-used)
-3. [Want To Contribute ??](#-want-to-contribute-)
-4. [Known Bugs](#-known-bugs)
-5. [Future Development](#-future-development-plan)
+1. [git commit message suggestion](#git-commit-message-suggestion)
+1. [Requirements](#requirements)
+2. [Technology Used](#technology-used)
+3. [Want To Contribute ??](#want-to-contribute)
+4. [Known Bugs](#known-bugs)
+5. [Future Development](#future-development-plan)
 6. [License](#license)
 7. [FAQ](#faq)
-8. [Reference](#-reference)
-9. [Meet Team](#-team--role)
+8. [Reference](#reference)
+9. [Meet Team](#team--role)
 
+## **git commit message suggestion**
+use past tense for commit message.
+1. feat     - new feature
+2. fix      - bug fix
+3. docs     - changes in documentation
+4. style    - everything related to styling
+5. refactor - code changes that neither fixes a bug or add new features
+6. test     - everything related to testing
+7. chore    - updating build task, package manager configs etc..
 
 ## **Requirements**
 #### python version >= 3

@@ -1,10 +1,20 @@
 import argparse
 import csv
 import os
+from database import connect_database
 
 import cv2
 
 def capture_frames(Id, name):
+    # TODO: To check from DB that any student with same id exist or not
+    # result = connect_database()
+    # con = result[0]
+    # cursor = result[1]
+    # if cursor.execute("select enroll_no from student where enroll_no=%s", Id):
+    #     return 'same-id'
+    # con.close()
+
+    #
     with open("StudentDetails.csv", 'r') as csvFile:
         lines = csv.reader(csvFile)
         data = list(lines)
@@ -17,6 +27,9 @@ def capture_frames(Id, name):
 
                 if row == '\n':
                     break
+    #
+
+
     parser = argparse.ArgumentParser(description='Capture Student Face Image.')
     parser.add_argument('--face_cascade', default='haarcascade_frontalface_default.xml')
     parser.add_argument('--camera', type=int, default=0)
@@ -36,10 +49,12 @@ def capture_frames(Id, name):
     if not cap.isOpened:
         return 'video-open-error'
 
+    # TODO : Need to replace csv with db so below line is useless.
     row = [Id, name]
+
     sampleNum = 0
 
-    while (True):
+    while 1:
         ret, frame = cap.read()
         if frame is None:
             cap.release()
@@ -76,6 +91,8 @@ def capture_frames(Id, name):
         elif sampleNum == 100:
             break
 
+    # TODO : Again below code is useless as we need to add info to db which will happen
+    #  if user will press submit button.
     with open("StudentDetails.csv", 'a+', newline='') as csvFile:
         writer = csv.writer(csvFile)
         writer.writerow(row)

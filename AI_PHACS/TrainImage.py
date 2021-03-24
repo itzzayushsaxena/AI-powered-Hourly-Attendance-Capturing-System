@@ -38,34 +38,40 @@ def getImagesAndLabels(path):
 
     # get the path of all the files in the folder
     imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
-    # print(imagePaths)
 
     # create empty face list
     faces = []
     # create empty ID list
-    Ids = []
-    # now looping through all the image paths and loading the Ids and the images
+    ids = []
+    # now looping through all the image paths and loading the ids and the images
     for imagePath in imagePaths:
         # loading the image and converting it to gray scale
         pilImage = Image.open(imagePath).convert('L')
         # print(pilImage)
         # Now we are converting the PIL image into numpy array
         imageNp = np.array(pilImage)
+
         # getting the Id from the image
-        Id = int(os.path.split(imagePath)[1].split("_")[1])
-        # print(os.path.split(imagePath)[1].split("_")[1])
+        Id = os.path.split(imagePath)[1].split("_")[1]
+        Id = int(Id[:2] + Id[5:])
+
+        # TODO : 15 digit id is not acceptable so ...
+        # Id = int(os.path.split(imagePath)[1].split("_")[1].split('123')[1])
+        # print(os.path.split(imagePath)[1].split("_")[1].split('18123')[1])
 
         # extract the face from the training image sample
         faces.append(imageNp)
-        Ids.append(Id)
-    return faces, Ids
+        ids.append(Id)
+
+    return faces, ids
 
 
 # ----------- train images function ---------------
 def train_model():
-    recognizer = cv2.face_LBPHFaceRecognizer.create()
-    faces, Ids = getImagesAndLabels("captured_images")
-    Thread(target = recognizer.train(faces, np.array(Ids))).start()
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    faces, ids = getImagesAndLabels("captured_images")
+    ids = np.array(ids)
+    # Thread(target=recognizer.train(faces, ids)).start()
+    Thread(target=recognizer.train(faces, ids)).start()
     recognizer.save("TrainingImageLabel"+os.sep+"Trainner.yml")
-    # print("TrainingImageLabel"+os.sep+"Trainner.yml")
     return True
